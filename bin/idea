@@ -1,0 +1,6 @@
+#!/bin/zsh
+
+# open a folder in IntelliJ
+# see https://www.jetbrains.com/help/idea/working-with-the-ide-features-from-command-line.html#standalone
+
+open -na "/Applications/IntelliJ IDEA.app" --args "$@"

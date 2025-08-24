@@ -7,6 +7,7 @@
 # Note: Use zsh array semantics and later join with ':'
 typeset -ga ZSHRC_PATH_ARRAY
 ZSHRC_PATH_ARRAY=(
+    "$ZSHRC_ROOT/bin"       # this repo's bin folder
     "$HOME/.local/bin"
     "$HOME/bin"
     "/opt/homebrew/bin"     # macOS (Apple Silicon Homebrew)

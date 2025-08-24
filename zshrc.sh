@@ -15,3 +15,5 @@ ZSHRC_SOURCE_FILES=(
 for _f in "${ZSHRC_SOURCE_FILES[@]}"; do
     source "$ZSHRC_ROOT/zshrc.d/$_f"
 done
+
+alias szsh="source ~/.zshrc"
