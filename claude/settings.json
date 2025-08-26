@@ -1,0 +1,8 @@
+{
+  "hooks": {
+    "onEdit": {
+      "command": "if [[ \"$CLAUDE_FILE\" == *.go ]]; then gofmt -w \"$CLAUDE_FILE\"; fi",
+      "description": "Run gofmt on Go files after editing"
+    }
+  }
+}

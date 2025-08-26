@@ -18,10 +18,20 @@ link_file() {
     echo "Linked $link_name -> $target"
 }
 
-main() {
+link_claude() {
+    link_file "$ZSHRC_ROOT/claude/settings.json" "$HOME/.claude/settings.json"
+}
+
+link_aider() {
+    link_file "$ZSHRC_ROOT/aider/aider.conf.yml" "$HOME/.aider.conf.yml"
+}
+
+link_zshrc() {
     link_file "$ZSHRC_ROOT/zshrc.sh" "$HOME/.zshrc"
     link_file "$ZSHRC_ROOT/zshenv.sh" "$HOME/.zshenv"
     echo "Done. Open a new shell or run: source ~/.zshrc"
 }
 
-main "$@"
+link_claude
+link_aider
+link_zshrc

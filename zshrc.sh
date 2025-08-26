@@ -8,8 +8,12 @@ export ZSH="${ZSH-"$HOME/.oh-my-zsh"}"
 # Files to source in order from zshrc.d
 ZSHRC_SOURCE_FILES=(
     "path.sh"        # Initialize PATH first
+    "zsh.sh"         # Zsh completions, etc.
     "oh_my_zsh.sh"   # Load Oh My Zsh
     "git.sh"         # Git aliases (optional)
+    "direnv.sh"
+    "python.sh"
+    "aider.sh"
 )
 
 for _f in "${ZSHRC_SOURCE_FILES[@]}"; do
