@@ -1,7 +1,8 @@
 env-file: /Users/mknopf/code/github/zshrc/aider/aider.env
 
 #model: gpt-4o-mini
-model: o1-mini        # assuming architect mode
+model: o1              # assuming architect mode
+#model: o1-mini        # assuming architect mode
 
 # When you need extra oomph (invoke with: /model <name> or restart with --model)
 alias:
@@ -60,7 +61,7 @@ dark-mode: true
 ## Enable/disable watching files for ai coding comments (default: False)
 #watch-files: false
 
-auto-commits: false
+auto-commits: true
 
 
 ########################
