@@ -14,6 +14,7 @@ ZSHRC_SOURCE_FILES=(
     "direnv.sh"
     "python.sh"
     "aider.sh"
+    "terraform.sh"
 )
 
 for _f in "${ZSHRC_SOURCE_FILES[@]}"; do
@@ -21,3 +22,6 @@ for _f in "${ZSHRC_SOURCE_FILES[@]}"; do
 done
 
 alias szsh="source ~/.zshrc"
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /opt/homebrew/bin/terragrunt terragrunt

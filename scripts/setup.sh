@@ -30,6 +30,14 @@ link_direnv() {
     link_file "$ZSHRC_ROOT/direnv/direnv.toml" "$HOME/.config/direnv/direnv.toml"
 }
 
+link_junie() {
+    link_file "$ZSHRC_ROOT/junie" "$HOME/.junie"
+}
+
+link_aws() {
+    link_file "$ZSHRC_ROOT/aws" "$HOME/.aws"
+}
+
 link_zshrc() {
     link_file "$ZSHRC_ROOT/zshrc.sh" "$HOME/.zshrc"
     link_file "$ZSHRC_ROOT/zshenv.sh" "$HOME/.zshenv"
@@ -39,4 +47,6 @@ link_zshrc() {
 link_claude
 link_aider
 link_direnv
+link_junie
+link_aws
 link_zshrc

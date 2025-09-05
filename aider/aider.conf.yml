@@ -1,8 +1,7 @@
 env-file: /Users/mknopf/code/github/zshrc/aider/aider.env
 
-#model: gpt-4o-mini
-model: o1              # assuming architect mode
-#model: o1-mini        # assuming architect mode
+model: o1                                             # architect
+editor-model: deepinfra/deepseek-ai/DeepSeek-V3.1     # editor
 
 # When you need extra oomph (invoke with: /model <name> or restart with --model)
 alias:
@@ -62,7 +61,7 @@ dark-mode: true
 #watch-files: false
 
 auto-commits: true
-
+add-gitignore-files: true
 
 ########################
 # Fixing and committing:
@@ -75,13 +74,13 @@ lint-cmd:
   - 'go: just lint'
 
 ## Enable/disable automatic linting after changes (default: True)
-#auto-lint: true
+auto-lint: false
 
 ## Specify command to run tests
-#test-cmd: xxx
+#test-cmd:
 
 ## Enable/disable automatic testing after changes (default: False)
-#auto-test: false
+auto-test: false
 
 
 ############
