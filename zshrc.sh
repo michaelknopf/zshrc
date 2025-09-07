@@ -1,6 +1,6 @@
 # ~/.zshrc is symlinked to this file
 
-export ZSHRC_ROOT="$HOME/code/github/zshrc"
+export ZSHRC_ROOT="$HOME/code/github/michaelknopf/zshrc"
 
 # Path to your Oh My Zsh installation (override here if not default)
 export ZSH="${ZSH-"$HOME/.oh-my-zsh"}"

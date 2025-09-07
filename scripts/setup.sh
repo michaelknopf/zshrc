@@ -6,7 +6,7 @@ set -euo pipefail
 #   ~/.zshrc  -> <repo>/zshrc.sh
 #   ~/.zshenv -> <repo>/zshenv.sh
 
-export ZSHRC_ROOT="$HOME/code/github/zshrc"
+export ZSHRC_ROOT="$HOME/code/github/michaelknopf/zshrc"
 
 link_file() {
     # link_file <target> <link_name>
