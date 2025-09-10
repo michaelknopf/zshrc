@@ -13,8 +13,10 @@ ZSHRC_SOURCE_FILES=(
     "git.sh"         # Git aliases (optional)
     "direnv.sh"
     "python.sh"
+    "node.sh"
     "aider.sh"
     "terraform.sh"
+    "twilio.sh"
 )
 
 for _f in "${ZSHRC_SOURCE_FILES[@]}"; do

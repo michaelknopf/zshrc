@@ -15,7 +15,8 @@ ZSHRC_PATH_ARRAY=(
     "/usr/bin"
     "/bin"
     "/usr/sbin"
-    "/sbin"
+    "/sbin",
+    "$HOME/.volta/bin"
 )
 
 # Merge existing PATH entries (split by ':'), appending those not already present
