@@ -14,6 +14,7 @@ ZSHRC_SOURCE_FILES=(
     "direnv.sh"
     "python.sh"
     "node.sh"
+    "ngrok.sh"
     "aider.sh"
     "terraform.sh"
     "twilio.sh"

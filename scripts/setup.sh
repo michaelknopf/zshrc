@@ -38,6 +38,10 @@ link_aws() {
     link_file "$ZSHRC_ROOT/aws" "$HOME/.aws"
 }
 
+link_ngrok() {
+    link_file "$ZSHRC_ROOT/ngrok/ngrok.yml" "$HOME/Library/Application Support/ngrok/ngrok.yml"
+}
+
 link_zshrc() {
     link_file "$ZSHRC_ROOT/zshrc.sh" "$HOME/.zshrc"
     link_file "$ZSHRC_ROOT/zshenv.sh" "$HOME/.zshenv"
@@ -49,4 +53,5 @@ link_aider
 link_direnv
 link_junie
 link_aws
+link_ngrok
 link_zshrc
