@@ -18,6 +18,7 @@ ZSHRC_SOURCE_FILES=(
     "aider.sh"
     "terraform.sh"
     "twilio.sh"
+    "overmind.sh"
 )
 
 for _f in "${ZSHRC_SOURCE_FILES[@]}"; do
