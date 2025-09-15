@@ -13,6 +13,7 @@ ZSHRC_SOURCE_FILES=(
     "git.sh"         # Git aliases (optional)
     "direnv.sh"
     "python.sh"
+    "go.sh"
     "node.sh"
     "ngrok.sh"
     "aider.sh"
