@@ -4,4 +4,9 @@
 
 /home/.aws/
 /ngrok/
-/home/.claude/ide/
+
+/home/.claude.json
+/home/.claude/*
+!/home/.claude/settings.json
+
+/zshrc.d/private.sh

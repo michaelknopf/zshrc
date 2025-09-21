@@ -1,8 +1,26 @@
 {
+  "permissions": {
+    "allow": [
+      "Read(**/*)",
+      "Bash(just:*)",
+      "Bash(pnpm:*)",
+      "Bash(docker:*)",
+      "Bash(go:*)"
+    ],
+    "defaultMode": "acceptEdits"
+  },
   "hooks": {
-    "onEdit": {
-      "command": "if [[ \"$CLAUDE_FILE\" == *.go ]]; then gofmt -w \"$CLAUDE_FILE\"; fi",
-      "description": "Run gofmt on Go files after editing"
-    }
-  }
+    "PostToolUse": [
+      {
+        "matcher": "Edit|MultiEdit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "gofmt -w \"$CLAUDE_PROJECT_DIR\""
+          }
+        ]
+      }
+    ]
+  },
+  "model": "opusplan"
 }
