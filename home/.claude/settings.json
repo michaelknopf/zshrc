@@ -11,7 +11,8 @@
       "Bash(curl:*)",
       "Bash(docker:*)",
       "Bash(cat:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(tree:*)"
     ],
     "defaultMode": "acceptEdits"
   },
@@ -26,7 +27,83 @@
           }
         ]
       }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude_hooks stop"
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude_hooks stop"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "claude_hooks notification"
+          }
+        ]
+      }
     ]
+  },
+  "mcpServers": {
+    "context7": {
+      "description": "Context7 MCP pulls up-to-date, version-specific documentation and code examples straight from the source — and places them directly into your prompt.",
+      "command": "pnpx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "memory": {
+      "description": "Persistent memory and context management for Claude Code sessions. Store and recall information across conversations and projects.",
+      "command": "pnpx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-memory"
+      ]
+    },
+    "fetch": {
+      "description": "Web content fetching and data extraction capabilities. Access external APIs, scrape web content, and integrate external data sources.",
+      "command": "pnpx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-fetch"
+      ]
+    },
+    "terraform": {
+      "description": "The Terraform MCP Server is a Model Context Protocol (MCP) server that provides seamless integration with Terraform Registry APIs, enabling advanced automation and interaction capabilities for Infrastructure as Code (IaC) development.",
+      "command": "docker",
+      "args": [
+        "run",
+        "-i",
+        "--rm",
+        "hashicorp/terraform-mcp-server"
+      ]
+    },
+    "python-sdk": {
+      "name": "Python SDK",
+      "description": "Official Python SDK with FastMCP for rapid MCP development",
+      "command": "python",
+      "args": ["-m", "python_sdk.server"],
+      "env": {}
+    }
   },
   "statusLine": {
     "type": "command",

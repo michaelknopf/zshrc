@@ -20,6 +20,7 @@ ZSHRC_SOURCE_FILES=(
     "terraform.sh"
     "twilio.sh"
     "overmind.sh"
+    "claude.sh"
     "private.sh"
 )
 
