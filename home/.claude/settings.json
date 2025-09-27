@@ -1,5 +1,4 @@
 {
-  "model": "opusplan",
   "permissions": {
     "allow": [
       "Read(**/*)",
@@ -16,6 +15,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
+  "model": "opusplan",
   "hooks": {
     "PostToolUse": [
       {
@@ -24,28 +24,6 @@
           {
             "type": "command",
             "command": "gofmt -w \"$CLAUDE_PROJECT_DIR\""
-          }
-        ]
-      }
-    ],
-    "Stop": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude_hooks stop"
-          }
-        ]
-      }
-    ],
-    "SubagentStop": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude_hooks stop"
           }
         ]
       }
@@ -61,6 +39,10 @@
         ]
       }
     ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
   },
   "mcpServers": {
     "context7": {
@@ -101,12 +83,11 @@
       "name": "Python SDK",
       "description": "Official Python SDK with FastMCP for rapid MCP development",
       "command": "python",
-      "args": ["-m", "python_sdk.server"],
+      "args": [
+        "-m",
+        "python_sdk.server"
+      ],
       "env": {}
     }
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
   }
 }
