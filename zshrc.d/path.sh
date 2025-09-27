@@ -3,6 +3,8 @@
 # - Idempotent: will not re-run if already initialized in this shell session
 # - Provides a helper to pretty-print PATH
 
+export PNPM_HOME="/Users/mknopf/Library/pnpm"
+
 # Define desired PATH entries. Customize as needed.
 # Note: Use zsh array semantics and later join with ':'
 typeset -ga ZSHRC_PATH_ARRAY
@@ -17,6 +19,7 @@ ZSHRC_PATH_ARRAY=(
     "/usr/sbin"
     "/sbin",
     "$HOME/.volta/bin"
+    "$PNPM_HOME"
 )
 
 # Merge existing PATH entries (split by ':'), appending those not already present

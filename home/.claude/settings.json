@@ -1,11 +1,17 @@
 {
+  "model": "opusplan",
   "permissions": {
     "allow": [
       "Read(**/*)",
       "Bash(just:*)",
       "Bash(pnpm:*)",
       "Bash(docker:*)",
-      "Bash(go:*)"
+      "Bash(go:*)",
+      "Bash(./bin:*)",
+      "Bash(curl:*)",
+      "Bash(docker:*)",
+      "Bash(cat:*)",
+      "Bash(lsof:*)"
     ],
     "defaultMode": "acceptEdits"
   },
@@ -22,5 +28,8 @@
       }
     ]
   },
-  "model": "opusplan"
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  }
 }

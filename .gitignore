@@ -6,7 +6,5 @@
 /ngrok/
 
 /home/.claude.json
-/home/.claude/*
-!/home/.claude/settings.json
 
 /zshrc.d/private.sh
