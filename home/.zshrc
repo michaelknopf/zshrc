@@ -21,6 +21,7 @@ ZSHRC_SOURCE_FILES=(
     "twilio.sh"
     "overmind.sh"
     "claude.sh"
+    "ruby.sh"
     "private.sh"
 )
 
