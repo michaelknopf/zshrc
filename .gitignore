@@ -6,5 +6,7 @@
 /ngrok/
 
 /home/.claude.json
+/home/.config/iterm2/
+/home/.config/flutter/
 
 /zshrc.d/private.sh

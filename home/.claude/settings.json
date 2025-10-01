@@ -15,7 +15,6 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "opusplan",
   "hooks": {
     "PostToolUse": [
       {

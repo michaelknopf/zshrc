@@ -20,6 +20,7 @@ ZSHRC_PATH_ARRAY=(
     "/sbin",
     "$HOME/.volta/bin"
     "$PNPM_HOME"
+    "$HOME/fvm/default/bin"
 )
 
 # Merge existing PATH entries (split by ':'), appending those not already present
