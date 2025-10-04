@@ -16,17 +16,6 @@
     "defaultMode": "acceptEdits"
   },
   "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Edit|MultiEdit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "gofmt -w \"$CLAUDE_PROJECT_DIR\""
-          }
-        ]
-      }
-    ],
     "Notification": [
       {
         "matcher": "*",

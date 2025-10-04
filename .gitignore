@@ -8,5 +8,6 @@
 /home/.claude.json
 /home/.config/iterm2/
 /home/.config/flutter/
+/home/.config/configstore/
 
 /zshrc.d/private.sh
