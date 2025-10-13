@@ -11,7 +11,11 @@
       "Bash(docker:*)",
       "Bash(cat:*)",
       "Bash(lsof:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(ls:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(head:*)"
     ],
     "defaultMode": "acceptEdits"
   },
@@ -32,6 +36,10 @@
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
+  "allowedTools": [
+    "Search",
+    "Read"
+  ],
   "mcpServers": {
     "context7": {
       "description": "Context7 MCP pulls up-to-date, version-specific documentation and code examples straight from the source — and places them directly into your prompt.",
@@ -77,5 +85,6 @@
       ],
       "env": {}
     }
-  }
+  },
+  "alwaysThinkingEnabled": true
 }
