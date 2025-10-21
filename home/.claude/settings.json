@@ -15,7 +15,9 @@
       "Bash(ls:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "Fetch(*)",
+      "Search(*)"
     ],
     "defaultMode": "acceptEdits"
   },
@@ -36,6 +38,7 @@
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
+  "alwaysThinkingEnabled": true,
   "allowedTools": [
     "Search",
     "Read"
@@ -86,5 +89,5 @@
       "env": {}
     }
   },
-  "alwaysThinkingEnabled": true
+  "model": "opusplan"
 }
