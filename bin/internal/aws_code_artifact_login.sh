@@ -53,6 +53,7 @@ echo "  Tool: $TOOL"
 echo
 
 aws codeartifact login \
+    --domain-owner "073835883885" \
     --domain "$DOMAIN" \
     --repository "$REPO" \
     --tool "$TOOL"
