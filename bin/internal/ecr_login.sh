@@ -3,8 +3,6 @@ set -euo pipefail
 
 export AWS_PROFILE='infra-admin'
 
-export AWS_PROFILE='infra-admin'
-
 # get region from current profile
 REGION=$(aws configure get region)
 if [ -z "$REGION" ]; then
