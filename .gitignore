@@ -9,5 +9,6 @@
 /home/.config/iterm2/
 /home/.config/flutter/
 /home/.config/configstore/
+/home/.config/pip/
 
 /zshrc.d/private.sh

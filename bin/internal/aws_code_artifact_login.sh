@@ -43,8 +43,17 @@ if [[ "$ENV" != "test" ]] && [[ "$ENV" != "release" ]]; then
     exit 1
 fi
 
-# Construct repository name
-REPO="${TOOL}-${ENV}"
+# Set TOOL to pip for Python-related tools
+case "$TOOL" in
+    python|pip|pypi)
+        TOOL="pip"
+        REPO="pypi-${ENV}"
+        ;;
+    node|npm|pnpm)
+        TOOL="npm"
+        REPO="npm-${ENV}"
+        ;;
+esac
 
 echo "Logging in to CodeArtifact..."
 echo "  Domain: $DOMAIN"
