@@ -22,6 +22,7 @@ ZSHRC_SOURCE_FILES=(
     "overmind.sh"
     "claude.sh"
     "ruby.sh"
+    "savi.sh"
     "private.sh"
 )
 

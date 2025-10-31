@@ -38,7 +38,7 @@
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
-  "alwaysThinkingEnabled": true,
+  "alwaysThinkingEnabled": false,
   "allowedTools": [
     "Search",
     "Read"
