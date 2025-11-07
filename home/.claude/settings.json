@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Read(**/*)",
+      "WebFetch",
+      "Fetch",
+      "Search",
+      "Read",
       "Bash(just:*)",
       "Bash(pnpm:*)",
       "Bash(docker:*)",
@@ -15,12 +18,16 @@
       "Bash(ls:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
-      "Bash(head:*)",
-      "Fetch(*)",
-      "Search(*)"
+      "Bash(head:*)"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "bypassPermissions",
+    "deny": [],
+    "ask": []
   },
+  "allowedTools": [
+    "Search",
+    "Read"
+  ]
   "hooks": {
     "Notification": [
       {
@@ -38,55 +45,8 @@
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
-  "alwaysThinkingEnabled": false,
-  "allowedTools": [
-    "Search",
-    "Read"
-  ],
-  "mcpServers": {
-    "context7": {
-      "description": "Context7 MCP pulls up-to-date, version-specific documentation and code examples straight from the source — and places them directly into your prompt.",
-      "command": "pnpx",
-      "args": [
-        "-y",
-        "@upstash/context7-mcp"
-      ]
-    },
-    "memory": {
-      "description": "Persistent memory and context management for Claude Code sessions. Store and recall information across conversations and projects.",
-      "command": "pnpx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-memory"
-      ]
-    },
-    "fetch": {
-      "description": "Web content fetching and data extraction capabilities. Access external APIs, scrape web content, and integrate external data sources.",
-      "command": "pnpx",
-      "args": [
-        "-y",
-        "@modelcontextprotocol/server-fetch"
-      ]
-    },
-    "terraform": {
-      "description": "The Terraform MCP Server is a Model Context Protocol (MCP) server that provides seamless integration with Terraform Registry APIs, enabling advanced automation and interaction capabilities for Infrastructure as Code (IaC) development.",
-      "command": "docker",
-      "args": [
-        "run",
-        "-i",
-        "--rm",
-        "hashicorp/terraform-mcp-server"
-      ]
-    },
-    "python-sdk": {
-      "name": "Python SDK",
-      "description": "Official Python SDK with FastMCP for rapid MCP development",
-      "command": "python",
-      "args": [
-        "-m",
-        "python_sdk.server"
-      ],
-      "env": {}
-    }
-  }
+  "enabledPlugins": {
+    "main@savi-tools": true
+  },
+  "alwaysThinkingEnabled": true
 }
