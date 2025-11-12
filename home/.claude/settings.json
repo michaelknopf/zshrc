@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "WebFetch",
+      "WebSearch",
       "Fetch",
       "Search",
       "Read",
@@ -20,14 +21,10 @@
       "Bash(grep:*)",
       "Bash(head:*)"
     ],
-    "defaultMode": "bypassPermissions",
     "deny": [],
-    "ask": []
+    "ask": [],
+    "defaultMode": "bypassPermissions"
   },
-  "allowedTools": [
-    "Search",
-    "Read"
-  ]
   "hooks": {
     "Notification": [
       {
@@ -48,5 +45,10 @@
   "enabledPlugins": {
     "main@savi-tools": true
   },
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "allowedTools": [
+    "Search",
+    "Read",
+    "WebSearch"
+  ]
 }
