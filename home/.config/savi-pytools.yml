@@ -1,13 +1,13 @@
 user_preferences:
   aws_all_profiles:
-  - infra-sso-admin
-  - test-sso-admin
-  - play-sso-admin
+  - infra-sso-power
+  - test-sso-power
+  - play-sso-power
   aws_default_access_level:
-    mgmt: admin
-    security: admin
-    infra: admin
-    test: admin
-    play: admin
-    stage: admin
-    prod: admin
+    mgmt: power
+    security: power
+    infra: power
+    test: power
+    play: power
+    stage: power
+    prod: power
