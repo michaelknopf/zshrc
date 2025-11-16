@@ -1,6 +1,7 @@
 # System-wide Claude Code Personalization
 
 - Do not leave deprecated code behind. We don't need it for backwards compatibility, or for future reference. Delete it and update consumers to use the updated implementation.
+- When creating PRs, do NOT add a "Test plan" section.
 
 ## Python
 
@@ -8,6 +9,9 @@
 - Prefer object-oriented patterns over module-level functions and global variables.
 - Prefer composition over inheritance.
 - Use strict types and generic types whenever possible. However, don't add redundant type annotations if the type checker can infer them.
+- Prefer pydantic models or dataclasses over dictionaries to represent static types. Meaning, write classes to model data if you know the structure up front.
+- Always use the `type` keyword with union types.
+- Do not "deconstruct" objects into local variables unless the full expression referencing the attr is long and/or repeated often. For example, just use `obj.attr` instead of creating `attr = obj.attr`.
 
 
 ### Docstrings

@@ -45,7 +45,7 @@
   "enabledPlugins": {
     "main@savi-tools": true
   },
-  "alwaysThinkingEnabled": true,
+  "alwaysThinkingEnabled": false,
   "allowedTools": [
     "Search",
     "Read",

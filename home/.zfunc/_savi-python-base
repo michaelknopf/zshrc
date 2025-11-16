@@ -1,0 +1,7 @@
+#compdef savi-python-base
+
+_savi_python_base_completion() {
+  eval $(env _TYPER_COMPLETE_ARGS="${words[1,$CURRENT]}" _SAVI_PYTHON_BASE_COMPLETE=complete_zsh savi-python-base)
+}
+
+compdef _savi_python_base_completion savi-python-base
