@@ -19,24 +19,13 @@
       "Bash(ls:*)",
       "Bash(find:*)",
       "Bash(grep:*)",
-      "Bash(head:*)"
+      "Bash(head:*)",
+      "Bash(gh:*)",
+      "Bash(jq:*)"
     ],
     "deny": [],
     "ask": [],
     "defaultMode": "bypassPermissions"
-  },
-  "hooks": {
-    "Notification": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "claude_hooks notification"
-          }
-        ]
-      }
-    ]
   },
   "statusLine": {
     "type": "command",
@@ -45,7 +34,7 @@
   "enabledPlugins": {
     "main@savi-tools": true
   },
-  "alwaysThinkingEnabled": true,
+  "alwaysThinkingEnabled": false,
   "allowedTools": [
     "Search",
     "Read",

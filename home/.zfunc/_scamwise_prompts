@@ -1,0 +1,7 @@
+#compdef scamwise_prompts
+
+_scamwise_prompts_completion() {
+  eval $(env _TYPER_COMPLETE_ARGS="${words[1,$CURRENT]}" _SCAMWISE_PROMPTS_COMPLETE=complete_zsh scamwise_prompts)
+}
+
+compdef _scamwise_prompts_completion scamwise_prompts
