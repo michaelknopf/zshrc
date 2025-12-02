@@ -27,6 +27,7 @@
     "ask": [],
     "defaultMode": "bypassPermissions"
   },
+  "model": "opusplan",
   "statusLine": {
     "type": "command",
     "command": "~/.claude/statusline.sh"
@@ -34,7 +35,7 @@
   "enabledPlugins": {
     "main@savi-tools": true
   },
-  "alwaysThinkingEnabled": false,
+  "alwaysThinkingEnabled": true,
   "allowedTools": [
     "Search",
     "Read",

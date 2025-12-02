@@ -12,6 +12,8 @@
 - Prefer pydantic models or dataclasses over dictionaries to represent static types. Meaning, write classes to model data if you know the structure up front.
 - Always use the `type` keyword with union types.
 - Do not "deconstruct" objects into local variables unless the full expression referencing the attr is long and/or repeated often. For example, just use `obj.attr` instead of creating `attr = obj.attr`.
+- NEVER import and re-export in a package's `__init__.py` file. We want imports to come from the package where the code is originally defined.
+- Never put code in `__init__.py` files, unless there is a very specific reason.
 
 
 ### Docstrings
