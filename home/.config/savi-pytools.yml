@@ -12,3 +12,13 @@ user_preferences:
     stage: admin
     prod: admin
     dns: admin
+  aws_all_account_levels:
+    infra:
+    - admin
+    test:
+    - power
+    - admin
+    play:
+    - admin
+  all_extra_commands:
+  - codeartifact
