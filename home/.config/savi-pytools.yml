@@ -18,7 +18,5 @@ user_preferences:
     test:
     - power
     - admin
-    play:
-    - admin
   all_extra_commands:
   - codeartifact

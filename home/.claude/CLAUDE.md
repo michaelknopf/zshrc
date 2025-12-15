@@ -1,6 +1,7 @@
 # System-wide Claude Code Personalization
 
-- Do not leave deprecated code behind. We don't need it for backwards compatibility, or for future reference. Delete it and update consumers to use the updated implementation.
+- Never commit or push directly to `main`. If you make changes with main checked out, run create a new branch before committing.
+- Do not leave deprecated code behind. We don't need it for backwards compatibility or for future reference. Delete it and update consumers to use the updated implementation.
 - When creating PRs, do NOT add a "Test plan" section.
 
 ## Python

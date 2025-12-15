@@ -33,9 +33,10 @@
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
-    "main@savi-tools": true
+    "main@savi-tools": true,
+    "savi@savi-tools": true
   },
-  "alwaysThinkingEnabled": true,
+  "alwaysThinkingEnabled": false,
   "allowedTools": [
     "Search",
     "Read",

@@ -10,5 +10,6 @@
 /home/.config/flutter/
 /home/.config/configstore/
 /home/.config/pip/
+home/.claude/stats-cache.json
 
 /zshrc.d/private.sh
