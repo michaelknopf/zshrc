@@ -1,0 +1,27 @@
+# Minimal prompt - just what you want
+format = """$directory$git_branch$python$character"""
+
+[directory]
+# Path relative to repo root
+repo_root_format = "[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style) "
+truncation_length = 100
+truncate_to_repo = true
+
+[git_branch]
+format = "[$branch]($style) "
+
+[git_status]
+disabled = true
+
+[python]
+format = "[🐍](yellow) "  # Just duck emoji when venv active
+detect_extensions = []
+detect_files = []
+detect_folders = []
+
+[package]
+disabled = true
+
+[character]
+success_symbol = "[❯](green)"
+error_symbol = "[❯](red)"

@@ -2,6 +2,8 @@
 
 export ZSHRC_ROOT="$HOME/code/github/michaelknopf/zshrc"
 
+eval "$(starship init zsh)"
+
 # Path to your Oh My Zsh installation (override here if not default)
 export ZSH="${ZSH-"$HOME/.oh-my-zsh"}"
 

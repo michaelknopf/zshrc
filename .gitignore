@@ -5,11 +5,15 @@
 /home/.aws/
 /ngrok/
 
+/home/.config/uv/uv.toml.backup
 /home/.claude.json
 /home/.config/iterm2/
 /home/.config/flutter/
 /home/.config/configstore/
 /home/.config/pip/
 home/.claude/stats-cache.json
+/home/.config/python_keyring/
+/home/.config/uv/uv.toml
+home/.zfunc/
 
 /zshrc.d/private.sh

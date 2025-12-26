@@ -34,7 +34,10 @@
   },
   "enabledPlugins": {
     "main@savi-tools": true,
-    "savi@savi-tools": true
+    "savi@savi-tools": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
+    "linear@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": false,
   "allowedTools": [
