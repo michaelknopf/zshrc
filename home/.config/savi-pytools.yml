@@ -16,7 +16,13 @@ user_preferences:
     infra:
     - admin
     test:
-    - power
     - admin
+    play:
+    - power
   all_extra_commands:
   - codeartifact
+  - ecr
+codeartifact:
+  account: infra
+ecr:
+  account: infra
