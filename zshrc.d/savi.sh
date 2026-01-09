@@ -1,0 +1,1 @@
+export AWS_SSO_MAX_ROLE=admin

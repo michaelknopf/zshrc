@@ -14,11 +14,17 @@ user_preferences:
     dns: admin
   aws_all_account_levels:
     infra:
+    - read
+    - power
     - admin
     test:
+    - read
+    - power
     - admin
     play:
+    - read
     - power
+    - admin
   all_extra_commands:
   - codeartifact
   - ecr
