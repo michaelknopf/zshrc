@@ -12,6 +12,5 @@
 /plans/
 /signoz-mcp-server/
 /mcp.json
-
-/home/.config/python_keyring/
-home/.config/python_keyring/
+/cache/
+.update.lock
