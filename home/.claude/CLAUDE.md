@@ -9,6 +9,7 @@
 ### Design
 - Prefer object-oriented patterns over module-level functions and global variables.
 - Prefer composition over inheritance.
+- Keep modules & classes small and focused. Look for parts of a class or file that could be extracted out as a standalone, self-sufficient class/module. Factor things into object-oriented, high and lower-level components that work together, instead of trying to do everything in one giant class.
 - Use strict types and generic types whenever possible. However, don't add redundant type annotations if the type checker can infer them.
 - Prefer pydantic models or dataclasses over dictionaries to represent static types. Meaning, write classes to model data if you know the structure up front.
 - Always use the `type` keyword with union types.
