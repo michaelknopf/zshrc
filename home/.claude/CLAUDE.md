@@ -6,9 +6,9 @@
 - Never run write operations against AWS without explicit permission from me!
 
 ## Design & Style
-- Prefer object-oriented patterns over module-level functions and global variables.
+- Prefer object-oriented patterns over module-level functions and global variables. Closures with bound state are acceptable as a lightweight alternative to single-method classes.
 - Composition over inheritance.
-- Don't create wrapper methods that add abstraction without providing value (e.g., simplifying the interface, adding logic, or improving clarity).
+- Don't create wrapper methods that add abstraction without providing value (e.g., simplifying the interface, adding logic, or improving clarity). However, sometimes wrapper methods are necessary for intentional indirection, like "controllers → services → data access."
 - Keep components small and focused on one topic and one level of abstraction. Decompose large components (files/classes/functions etc.) into standalone, self-sufficient components that work together.
 - **Levels of abstraction:** Structure code in hierarchical layers where high-level functions orchestrate by calling lower-level functions, which may in turn call even lower-level functions. Each function should operate at a single level of abstraction - don't mix high-level orchestration with low-level implementation details in the same function. If a function needs to perform a low-level operation, delegate it to a helper method or collaborator class. This creates code that reads like a summary at the top level, where you can drill down into details as needed.
 - Use strict types and generic types whenever possible. However, don't add redundant type annotations if the type checker / compiler can infer them.
