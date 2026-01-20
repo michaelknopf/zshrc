@@ -26,6 +26,8 @@ ZSHRC_SOURCE_FILES=(
     "ruby.sh"
     "savi.sh"
     "private.sh"
+    "google.sh"
+    "misc.sh"
 )
 
 for _f in "${ZSHRC_SOURCE_FILES[@]}"; do
