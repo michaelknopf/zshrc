@@ -35,7 +35,9 @@
   "enabledPlugins": {
     "main@savi-tools": true,
     "savi@savi-tools": true,
-    "pyright-lsp@claude-plugins-official": true
+    "pyright-lsp@claude-plugins-official": true,
+    "beads@beads-marketplace": true,
+    "feature-dev@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": false,
   "allowedTools": [

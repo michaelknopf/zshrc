@@ -28,5 +28,5 @@
     with mutliple lines.
     """
     ```
-- Never add comments to ignore errors from mypy or pyright.
+- Never add comments to ignore errors from mypy or pyright. In targeted sitautions, you may ask permission to do this if there is no practical alternative.
 - Never use `__all__` unless there is a very specific reason. Allow modules to implicitly export everything.
