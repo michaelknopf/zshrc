@@ -17,16 +17,21 @@
 ## Python
 
 - Prefer pydantic models or dataclasses over dictionaries to represent static types. Meaning, write classes to model data if you know the structure up front.
-- Always use the `type` keyword with union types.
+- Always use the `type` keyword when creating type aliases.
 - NEVER import and re-export in a package's `__init__.py` file. We want imports to come from the package where the code is originally defined.
 - Never put code in `__init__.py` files, unless there is a very specific reason.
 - Never use `__all__` unless there is a very specific reason. Allow modules to implicitly export everything.
-- MULTILINE docstrings MUST ALWAYS have a blank line after the opening triple quotes and before the closing triple quotes, like this:
+- MULTILINE docstrings MUST ALWAYS have a newline after the opening triple quotes and before the closing triple quotes, like this:
     ```python
     """
     This is a docstring
-    with mutliple lines.
+    with multiple lines.
     """
     ```
-- Never add comments to ignore errors from mypy or pyright. In targeted sitautions, you may ask permission to do this if there is no practical alternative.
+    NEVER like this:
+    ```python
+    """This is a docstring
+    with multiple lines."""
+    ```
+- Never add comments to ignore errors from mypy or pyright. In targeted situations, you may ask permission to do this if there is no practical alternative.
 - Never use `__all__` unless there is a very specific reason. Allow modules to implicitly export everything.
