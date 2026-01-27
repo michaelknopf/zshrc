@@ -37,7 +37,8 @@
     "savi@savi-tools": true,
     "pyright-lsp@claude-plugins-official": true,
     "beads@beads-marketplace": true,
-    "feature-dev@claude-plugins-official": true
+    "feature-dev@claude-plugins-official": true,
+    "oracle@oracle": true
   },
   "alwaysThinkingEnabled": false,
   "allowedTools": [
