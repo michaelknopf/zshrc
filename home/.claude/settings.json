@@ -33,7 +33,6 @@
     "command": "~/.claude/statusline.sh"
   },
   "enabledPlugins": {
-    "main@savi-tools": true,
     "savi@savi-tools": true,
     "pyright-lsp@claude-plugins-official": true,
     "beads@beads-marketplace": true,
