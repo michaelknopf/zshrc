@@ -15,5 +15,6 @@
 /home/.config/uv/uv.toml
 /home/.zfunc/
 /home/.config/gcloud
+/home/.zsh/
 
 /zshrc.d/private.sh

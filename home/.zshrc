@@ -39,6 +39,4 @@ alias szsh="source ~/.zshrc"
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terragrunt terragrunt
 
-fpath+=~/.zfunc; autoload -Uz compinit; compinit
-
 zstyle ':completion:*' menu select
