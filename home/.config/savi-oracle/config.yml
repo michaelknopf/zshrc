@@ -1,0 +1,11 @@
+# Repos to index when running `oracle index` with no folder argument
+default_repos:
+  - ~/code/github/savi/oracle
+  - ~/code/github/savi/cdk-common
+  - ~/code/github/savi/infra-terraform
+  - ~/code/github/savi/db
+  - ~/code/github/savi/savi-pytools
+  - ~/code/github/savi/github-terraform
+
+# Directory patterns to ignore in recursive mode
+ignored_repos: []

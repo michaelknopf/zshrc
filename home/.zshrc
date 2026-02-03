@@ -40,3 +40,7 @@ autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terragrunt terragrunt
 
 zstyle ':completion:*' menu select
+
+# IDK how this got here, maybe something auto added it?
+# TODO: Remove if we're not having issues in after a few days.
+#fpath+=~/.zfunc; autoload -Uz compinit; compinit

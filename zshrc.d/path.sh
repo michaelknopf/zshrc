@@ -21,6 +21,7 @@ ZSHRC_PATH_ARRAY=(
     "$HOME/.volta/bin"
     "$PNPM_HOME"
     "$HOME/fvm/default/bin"
+    "/opt/homebrew/opt/postgresql@16/bin"
 )
 
 # Merge existing PATH entries (split by ':'), appending those not already present
