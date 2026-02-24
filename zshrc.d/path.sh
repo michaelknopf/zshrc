@@ -12,12 +12,13 @@ ZSHRC_PATH_ARRAY=(
     "$ZSHRC_ROOT/bin"       # this repo's bin folder
     "$HOME/.local/bin"
     "$HOME/bin"
+    "$HOME/go/bin"
     "/opt/homebrew/bin"     # macOS (Apple Silicon Homebrew)
     "/usr/local/bin"        # macOS (Intel Homebrew) / common
     "/usr/bin"
     "/bin"
     "/usr/sbin"
-    "/sbin",
+    "/sbin"
     "$HOME/.volta/bin"
     "$PNPM_HOME"
     "$HOME/fvm/default/bin"

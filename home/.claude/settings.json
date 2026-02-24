@@ -44,5 +44,6 @@
     "Search",
     "Read",
     "WebSearch"
-  ]
+  ],
+  "skipDangerousModePermissionPrompt": true
 }

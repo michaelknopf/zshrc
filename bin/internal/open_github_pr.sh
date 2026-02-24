@@ -28,5 +28,18 @@ if [[ -n "$pr_url" ]]; then
     fi
 else
     echo "No open PR found for branch '$branch' -> main."
-    exit 1
+    read "answer?Create one? [y/n] "
+    if [[ "$answer" == "y" ]]; then
+        repo_url=$(gh repo view --json url -q '.url')
+        create_url="${repo_url}/compare/main...${branch}?expand=1"
+        echo "Opening: $create_url"
+        if command -v xdg-open >/dev/null; then
+            xdg-open "$create_url"
+        elif command -v open >/dev/null; then
+            open "$create_url"   # macOS
+        else
+            echo "No known way to open URLs on this system."
+            exit 1
+        fi
+    fi
 fi
