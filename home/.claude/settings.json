@@ -40,10 +40,10 @@
     "oracle@oracle": true
   },
   "alwaysThinkingEnabled": false,
+  "skipDangerousModePermissionPrompt": true,
   "allowedTools": [
     "Search",
     "Read",
     "WebSearch"
-  ],
-  "skipDangerousModePermissionPrompt": true
+  ]
 }

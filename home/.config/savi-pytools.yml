@@ -13,6 +13,10 @@ user_preferences:
     prod: admin
     dns: admin
   aws_all_account_levels:
+    mgmt:
+    - read
+    - power
+    - admin
     infra:
     - read
     - power
@@ -22,6 +26,10 @@ user_preferences:
     - power
     - admin
     play:
+    - read
+    - power
+    - admin
+    prod:
     - read
     - power
     - admin

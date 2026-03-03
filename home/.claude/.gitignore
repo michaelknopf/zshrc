@@ -11,10 +11,11 @@
 /plugins
 /plans/
 /signoz-mcp-server/
-/mcp.json
+/.mcp.json
 /cache/
 .update.lock
 /paste-cache/
 /telemetry/
 /tasks/
 /backups/
+/mcp-needs-auth-cache.json
