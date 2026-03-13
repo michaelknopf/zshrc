@@ -1,4 +1,42 @@
 {
+  "allowedTools": [
+    "Search",
+    "Read",
+    "WebSearch"
+  ],
+  "alwaysThinkingEnabled": false,
+  "enabledPlugins": {
+    "beads@beads-marketplace": true,
+    "feature-dev@claude-plugins-official": true,
+    "oracle@oracle": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "savi@savi-tools": true
+  },
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "command": "bd prime --stealth",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ],
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "command": "bd prime --stealth",
+            "type": "command"
+          }
+        ],
+        "matcher": ""
+      }
+    ]
+  },
+  "model": "opusplan",
   "permissions": {
     "allow": [
       "WebFetch",
@@ -23,27 +61,13 @@
       "Bash(gh:*)",
       "Bash(jq:*)"
     ],
-    "deny": [],
     "ask": [],
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "bypassPermissions",
+    "deny": []
   },
-  "model": "opusplan",
-  "statusLine": {
-    "type": "command",
-    "command": "~/.claude/statusline.sh"
-  },
-  "enabledPlugins": {
-    "savi@savi-tools": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "beads@beads-marketplace": true,
-    "feature-dev@claude-plugins-official": true,
-    "oracle@oracle": true
-  },
-  "alwaysThinkingEnabled": false,
   "skipDangerousModePermissionPrompt": true,
-  "allowedTools": [
-    "Search",
-    "Read",
-    "WebSearch"
-  ]
+  "statusLine": {
+    "command": "~/.claude/statusline.sh",
+    "type": "command"
+  }
 }
