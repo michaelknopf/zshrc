@@ -1,42 +1,4 @@
 {
-  "allowedTools": [
-    "Search",
-    "Read",
-    "WebSearch"
-  ],
-  "alwaysThinkingEnabled": false,
-  "enabledPlugins": {
-    "beads@beads-marketplace": true,
-    "feature-dev@claude-plugins-official": true,
-    "oracle@oracle": true,
-    "pyright-lsp@claude-plugins-official": true,
-    "savi@savi-tools": true
-  },
-  "hooks": {
-    "PreCompact": [
-      {
-        "hooks": [
-          {
-            "command": "bd prime --stealth",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ],
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "command": "bd prime --stealth",
-            "type": "command"
-          }
-        ],
-        "matcher": ""
-      }
-    ]
-  },
-  "model": "opusplan",
   "permissions": {
     "allow": [
       "WebFetch",
@@ -61,13 +23,51 @@
       "Bash(gh:*)",
       "Bash(jq:*)"
     ],
+    "deny": [],
     "ask": [],
-    "defaultMode": "bypassPermissions",
-    "deny": []
+    "defaultMode": "bypassPermissions"
   },
-  "skipDangerousModePermissionPrompt": true,
+  "model": "opusplan",
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime --stealth"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime --stealth"
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
-    "command": "~/.claude/statusline.sh",
-    "type": "command"
-  }
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "enabledPlugins": {
+    "beads@beads-marketplace": true,
+    "feature-dev@claude-plugins-official": true,
+    "oracle@oracle": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "savi@savi-tools": true
+  },
+  "alwaysThinkingEnabled": false,
+  "skipDangerousModePermissionPrompt": true,
+  "allowedTools": [
+    "Search",
+    "Read",
+    "WebSearch"
+  ]
 }
