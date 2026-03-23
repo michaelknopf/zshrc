@@ -64,6 +64,7 @@
     "savi@savi-tools": true
   },
   "alwaysThinkingEnabled": false,
+  "effortLevel": "medium",
   "skipDangerousModePermissionPrompt": true,
   "allowedTools": [
     "Search",

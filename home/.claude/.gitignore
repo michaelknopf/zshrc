@@ -1,21 +1,18 @@
-!/home/.claude/settings.json
+# Ignore everything by default — Claude generates tons of ephemeral data
+*
 
-/ide/
-/projects/
-/shell-snapshots/
-/statsig/
-/todos/
-/history.jsonl
-/file-history/
-/debug/
-/plugins
-/plans/
-/signoz-mcp-server/
-/.mcp.json
-/cache/
-.update.lock
-/paste-cache/
-/telemetry/
-/tasks/
-/backups/
-/mcp-needs-auth-cache.json
+# Allow the files we deliberately track
+!.gitignore
+!CLAUDE.md
+!settings.json
+!statusline.sh
+
+# Allow specific nested paths (must unignore each directory level)
+!archive/
+!archive/agents/
+!archive/agents/Debugger.md
+!docs/
+!docs/notes/
+!docs/notes/session-2026-01-27-claude-code-startup-optimization.md
+!plugins/
+!plugins/config.json
