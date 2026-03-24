@@ -16,3 +16,13 @@
 !docs/notes/session-2026-01-27-claude-code-startup-optimization.md
 !plugins/
 !plugins/config.json
+
+# User-authored content — track all files recursively
+!agents/
+!agents/**
+!commands/
+!commands/**
+!rules/
+!rules/**
+!skills/
+!skills/**
