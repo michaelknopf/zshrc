@@ -41,3 +41,4 @@ launchctl load ~/Library/LaunchAgents/<name>.plist
 ## Current Agents
 
 - `com.mknopf.kill-orphaned-claude.xml` - Periodically kills orphaned Claude processes that have been re-parented to launchd
+- `com.mknopf.claude-cleanup.xml` - Deletes Claude conversation history, debug logs, and session data older than 3 days to reclaim disk space (runs daily)
