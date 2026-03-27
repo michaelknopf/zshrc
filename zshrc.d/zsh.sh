@@ -6,3 +6,5 @@ fpath=("$HOME/.zfunc" "$ZSH_COMPLETIONS_DIR" $fpath)
 # Enable completion system if not already
 autoload -Uz compinit
 compinit
+
+unset URLGLOBBER

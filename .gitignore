@@ -16,5 +16,6 @@
 /home/.zfunc/
 /home/.config/gcloud
 /home/.zsh/
+/home/docs/
 
 /zshrc.d/private.sh
