@@ -8,4 +8,5 @@ alias p=pnpm
 # Regenerate with: pnpm completion zsh > ~/.zsh/completions/_pnpm
 [[ -f "$ZSH_COMPLETIONS_DIR/_pnpm" ]] || pnpm completion zsh > "$ZSH_COMPLETIONS_DIR/_pnpm"
 
-alias pup="pnpm update --latest"
+#alias pup="pnpm update --latest"
+alias pup="pnpm up --latest '!eslint' '!typescript'"

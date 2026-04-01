@@ -54,17 +54,18 @@
   },
   "statusLine": {
     "type": "command",
-    "command": "~/.claude/statusline.sh"
+    "command": "/Users/mknopf/code/github/savi/claude-code-plugins/plugins/mk/scripts/statusline.sh"
   },
   "enabledPlugins": {
-    "beads@beads-marketplace": true,
     "feature-dev@claude-plugins-official": true,
     "oracle@oracle": true,
     "pyright-lsp@claude-plugins-official": true,
-    "savi@savi-tools": true
+    "savi@savi-tools": true,
+    "mk@savi-tools": true
   },
   "alwaysThinkingEnabled": false,
   "effortLevel": "medium",
+  "showClearContextOnPlanAccept": true,
   "skipDangerousModePermissionPrompt": true,
   "allowedTools": [
     "Search",
