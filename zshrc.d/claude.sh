@@ -32,4 +32,13 @@ export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
 export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 
 # Use Bedrock as the provider for Claude Code
-alias claude-bedrock='CLAUDE_CODE_USE_BEDROCK=1 ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-4-6 AWS_PROFILE=play-sso-power claude'
+alias claude-bedrock='CLAUDE_CODE_USE_BEDROCK=1 ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-4-6 ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4-6 AWS_PROFILE=play-sso-power claude'
+
+# Another option is to put this JSON in .claude/settings.json
+#"env": {
+#    "AWS_REGION": "us-west-2",
+#    "CLAUDE_CODE_USE_BEDROCK": "1",
+#    "ANTHROPIC_DEFAULT_SONNET_MODEL": "global.anthropic.claude-sonnet-4-6",
+#    "ANTHROPIC_DEFAULT_OPUS_MODEL": "global.anthropic.claude-opus-4-6-v1",
+#    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
+#},
