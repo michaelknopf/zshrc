@@ -2,3 +2,4 @@
 
 /docs/local/
 .playwright-mcp/
+.DS_Store
