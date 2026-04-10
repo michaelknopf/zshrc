@@ -1,7 +1,7 @@
 @/Users/mknopf/code/github/savi/claude-code-plugins/plugins/savi/docs/general-principles.md
 @/Users/mknopf/code/github/savi/claude-code-plugins/plugins/savi/docs/python-principles.md
 @/Users/mknopf/code/github/savi/claude-code-plugins/plugins/savi/docs/type-safety-principles.md
-@/Users/mknopf/code/github/savi/claude-code-plugins/plugins/savi/docs/debugging-guide.md
+@/Users/mknopf/code/github/savi/claude-code-plugins/plugins/savi/docs/infrastructure-guide.md
 
 # Local Repo Layout
 
