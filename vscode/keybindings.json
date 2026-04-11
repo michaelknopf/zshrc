@@ -1,0 +1,8 @@
+[
+  // Custom: Git Blame — matches IntelliJ's Cmd+Opt+' for Annotate
+  {
+    "key": "cmd+alt+'",
+    "command": "gitlens.toggleFileBlame",
+    "when": "editorTextFocus"
+  }
+]

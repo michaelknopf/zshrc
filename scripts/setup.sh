@@ -38,7 +38,10 @@ link_ngrok() {
 }
 
 link_vscode() {
-    link_file "$ZSHRC_ROOT/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
+    # Symlink the entire vscode/ dir as the VSCode User directory.
+    # A .gitignore inside vscode/ whitelists only the tracked config files,
+    # so VSCode's runtime state (globalStorage, History, etc.) stays gitignored.
+    link_file "$ZSHRC_ROOT/vscode" "$HOME/Library/Application Support/Code/User"
 }
 
 link_all_home_files() {
@@ -75,5 +78,6 @@ link_all_home_files_recursive() {
 link_aider
 link_ngrok
 link_vscode
+# To install/sync VSCode extensions: ./scripts/vscode-extensions.sh
 link_all_home_files
 echo "Done. Open a new shell or run: source ~/.zshrc"

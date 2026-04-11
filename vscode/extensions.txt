@@ -1,0 +1,32 @@
+# IntelliJ Keybindings
+k--kato.intellij-idea-keybindings
+
+# Python
+ms-python.python
+ms-python.vscode-pylance
+charliermarsh.ruff
+
+# TypeScript / JavaScript
+esbenp.prettier-vscode
+
+# Git
+eamodio.gitlens
+
+# Docker & Remote
+ms-azuretools.vscode-containers
+ms-vscode-remote.remote-containers
+
+# Infrastructure
+hashicorp.terraform
+redhat.vscode-yaml
+
+# Editor Enhancements
+usernamehw.errorlens
+tamasfe.even-better-toml
+EditorConfig.EditorConfig
+
+# GitHub
+github.vscode-github-actions
+
+# Markdown
+yzhang.markdown-all-in-one

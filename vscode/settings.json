@@ -1,0 +1,171 @@
+{
+  // ── Editor ──────────────────────────────────────────────────────────────────
+  "editor.fontSize": 14,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": true,
+  "editor.renderWhitespace": "trailing",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  "editor.stickyScroll.enabled": true,
+  "editor.minimap.enabled": false,
+  "editor.cursorBlinking": "smooth",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.smoothScrolling": true,
+  "editor.linkedEditing": true,
+  "editor.wordWrap": "off",
+  "editor.rulers": [120],
+  "editor.suggestSelection": "first",
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  // Show inlay hints only when holding Opt — matches IntelliJ's default behavior
+  "editor.inlayHints.enabled": "offUnlessPressed",
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": false,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+  },
+
+  // ── Files ────────────────────────────────────────────────────────────────────
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": true,
+  // Auto-save on focus change — IntelliJ saves aggressively; this is the closest equivalent
+  "files.autoSave": "onFocusChange",
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.mypy_cache": true,
+    "**/.ruff_cache": true,
+    "**/*.pyc": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/.terraform": true,
+  },
+  "files.associations": {
+    "*.tf": "terraform",
+    "*.tfvars": "terraform",
+    "*.hcl": "terraform",
+    "Dockerfile.*": "dockerfile",
+    ".env*": "dotenv",
+  },
+
+  // ── Search ───────────────────────────────────────────────────────────────────
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.venv": true,
+    "**/venv": true,
+    "**/.terraform": true,
+    "**/coverage": true,
+    "**/*.min.js": true,
+  },
+
+  // ── Workbench ────────────────────────────────────────────────────────────────
+  "workbench.startupEditor": "none",
+  "workbench.editor.enablePreview": true,
+  "workbench.editor.tabSizing": "shrink",
+  "window.zoomLevel": 1,
+  "workbench.tree.indent": 16,
+  // Show every folder level — IntelliJ doesn't collapse intermediary dirs
+  "explorer.compactFolders": false,
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+
+  // ── Terminal ──────────────────────────────────────────────────────────────────
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "terminal.integrated.fontSize": 15,
+  "terminal.integrated.scrollback": 10000,
+  "terminal.integrated.copyOnSelection": true,
+
+  // ── Git ───────────────────────────────────────────────────────────────────────
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.openAfterClone": "always",
+  "diffEditor.ignoreTrimWhitespace": false,
+
+  // ── Python ────────────────────────────────────────────────────────────────────
+  // Use .venv in project root — matches uv convention
+  "python.defaultInterpreterPath": ".venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.tabSize": 4,
+    "editor.codeActionsOnSave": {
+      "source.fixAll": "explicit",
+      "source.organizeImports": "explicit",
+    },
+  },
+  "ruff.organizeImports": true,
+  // Standard mode is the fallback when no pyrightconfig.json is present in the project
+  "python.analysis.typeCheckingMode": "standard",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.variableTypes": false,
+
+  // ── TypeScript / JavaScript ───────────────────────────────────────────────────
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+  },
+  "[javascriptreact]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+  },
+
+  // ── JSON / YAML / TOML / Markdown ─────────────────────────────────────────────
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+  },
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.tabSize": 2,
+  },
+  "[yaml]": {
+    "editor.tabSize": 2,
+  },
+  "[markdown]": {
+    "editor.wordWrap": "on",
+    "editor.quickSuggestions": {
+      "other": "off",
+      "comments": "off",
+      "strings": "off",
+    },
+  },
+
+  // ── Terraform ─────────────────────────────────────────────────────────────────
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+  },
+  "[terraform-vars]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.tabSize": 2,
+  },
+
+  // ── GitLens ───────────────────────────────────────────────────────────────────
+  "gitlens.currentLine.enabled": true,
+  // Code lens (above functions) is noisy; toggle blame manually with Cmd+Opt+'
+  "gitlens.codeLens.enabled": false,
+  "gitlens.hovers.currentLine.over": "line",
+
+  // ── Error Lens ────────────────────────────────────────────────────────────────
+  "errorLens.gutterIconsEnabled": true,
+  "errorLens.messageMaxChars": 120,
+
+  // ── Red Hat (YAML extension) ──────────────────────────────────────────────────
+  "redhat.telemetry.enabled": false,
+  "gitlens.ai.model": "vscode",
+  "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+}

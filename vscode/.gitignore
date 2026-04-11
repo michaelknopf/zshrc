@@ -1,0 +1,8 @@
+# Ignore everything by default (VSCode writes runtime state here)
+*
+
+# Allow the files we deliberately track
+!.gitignore
+!settings.json
+!keybindings.json
+!extensions.txt
