@@ -1,5 +1,5 @@
 model = "gpt-5.4"
-model_reasoning_effort = "medium"
+model_reasoning_effort = "high"
 personality = "pragmatic"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
@@ -17,6 +17,9 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/Users/mknopf/code/github/michaelknopf/zshrc"]
+trust_level = "trusted"
+
+[projects."/Users/mknopf/code/github/savi/claude-code-plugins"]
 trust_level = "trusted"
 
 [mcp_servers.Oracle]

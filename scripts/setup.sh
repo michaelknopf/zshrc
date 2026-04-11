@@ -14,6 +14,8 @@ link_file() {
     local target="$1"
     local link_name="$2"
 
+    mkdir -p "${link_name:h}"
+
     # don't overwrite directories unless FORCE_REPLACE is set
     if [[ -d "$link_name" && ! -L "$link_name" ]]; then
         if [[ "${FORCE_REPLACE:-0}" != "1" ]]; then
@@ -33,6 +35,10 @@ link_aider() {
 
 link_ngrok() {
     link_file "$ZSHRC_ROOT/ngrok/ngrok.yml" "$HOME/Library/Application Support/ngrok/ngrok.yml"
+}
+
+link_vscode() {
+    link_file "$ZSHRC_ROOT/vscode/settings.json" "$HOME/Library/Application Support/Code/User/settings.json"
 }
 
 link_all_home_files() {
@@ -68,5 +74,6 @@ link_all_home_files_recursive() {
 
 link_aider
 link_ngrok
+link_vscode
 link_all_home_files
 echo "Done. Open a new shell or run: source ~/.zshrc"
