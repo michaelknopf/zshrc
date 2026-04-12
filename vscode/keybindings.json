@@ -17,4 +17,30 @@
     "key": "cmd+k",
     "command": "-git.commitAll"
   },
+
+  // Unbind: cmd+n opens a new untitled file (scratch) by default; reclaim it for new file in explorer
+  {
+    "key": "cmd+n",
+    "command": "-workbench.action.files.newUntitledFile",
+  },
+
+  // New File in Explorer (in the selected folder, not a scratch file)
+  {
+    "key": "cmd+n",
+    "command": "explorer.newFile",
+    "when": "explorerViewletFocus",
+  },
+
+  // Unbind: cmd+shift+n opens a new window by default; reclaim it for new folder
+  {
+    "key": "cmd+shift+n",
+    "command": "-workbench.action.newWindow",
+  },
+
+  // New Folder in Explorer
+  {
+    "key": "cmd+shift+n",
+    "command": "explorer.newFolder",
+    "when": "explorerViewletFocus",
+  },
 ]

@@ -23,6 +23,9 @@ ms-vscode-remote.remote-containers
 hashicorp.terraform
 redhat.vscode-yaml
 
+# Justfiles
+nefrob.vscode-just-syntax
+
 # Editor Enhancements
 usernamehw.errorlens
 tamasfe.even-better-toml
