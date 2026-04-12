@@ -9,6 +9,9 @@ charliermarsh.ruff
 # TypeScript / JavaScript
 esbenp.prettier-vscode
 
+# AI
+anthropic.claude-code
+
 # Git
 eamodio.gitlens
 
@@ -28,5 +31,9 @@ EditorConfig.EditorConfig
 # GitHub
 github.vscode-github-actions
 
+# Themes
+trinm1709.dracula-theme-from-intellij
+
 # Markdown
 yzhang.markdown-all-in-one
+DarrenJMcLeod.markdown-toggle-preview

@@ -3,6 +3,18 @@
   {
     "key": "cmd+alt+'",
     "command": "gitlens.toggleFileBlame",
-    "when": "editorTextFocus"
-  }
+    "when": "editorTextFocus",
+  },
+
+  // Markdown: Cmd+Shift+V true toggle — source↔preview without duplicate tabs (requires DarrenJMcLeod.markdown-toggle-preview)
+  {
+    "key": "cmd+shift+v",
+    "command": "markdownToggle.toggleView",
+  },
+
+  // Unbind: IntelliJ plugin maps Cmd+K to git.commitAll; drop when-clause for reliable removal
+  {
+    "key": "cmd+k",
+    "command": "-git.commitAll"
+  },
 ]

@@ -22,7 +22,7 @@
   "editor.formatOnSave": true,
   "editor.formatOnPaste": false,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit",
+    "source.organizeImports": "explicit"
   },
 
   // ── Files ────────────────────────────────────────────────────────────────────
@@ -39,14 +39,14 @@
     "**/*.pyc": true,
     "**/.DS_Store": true,
     "**/node_modules": true,
-    "**/.terraform": true,
+    "**/.terraform": true
   },
   "files.associations": {
     "*.tf": "terraform",
     "*.tfvars": "terraform",
     "*.hcl": "terraform",
     "Dockerfile.*": "dockerfile",
-    ".env*": "dotenv",
+    ".env*": "dotenv"
   },
 
   // ── Search ───────────────────────────────────────────────────────────────────
@@ -58,14 +58,13 @@
     "**/venv": true,
     "**/.terraform": true,
     "**/coverage": true,
-    "**/*.min.js": true,
+    "**/*.min.js": true
   },
-
-  // ── Workbench ────────────────────────────────────────────────────────────────
   "workbench.startupEditor": "none",
   "workbench.editor.enablePreview": true,
   "workbench.editor.tabSizing": "shrink",
   "window.zoomLevel": 1,
+  "window.openFoldersInNewWindow": "on",
   "workbench.tree.indent": 16,
   // Show every folder level — IntelliJ doesn't collapse intermediary dirs
   "explorer.compactFolders": false,
@@ -86,72 +85,129 @@
   "diffEditor.ignoreTrimWhitespace": false,
 
   // ── Python ────────────────────────────────────────────────────────────────────
-  // Use .venv in project root — matches uv convention
-  "python.defaultInterpreterPath": ".venv/bin/python",
+  // Discover .venv in the workspace root — matches uv convention.
+  // Note: python.defaultInterpreterPath does not support ${workspaceFolder} in global user
+  // settings, so we rely on the Python extension's built-in venv auto-discovery instead.
   "python.terminal.activateEnvironment": true,
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.tabSize": 4,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
-      "source.organizeImports": "explicit",
-    },
+      "source.organizeImports": "explicit"
+    }
   },
   "ruff.organizeImports": true,
+  // Exclude virtualenv and site-packages from linting/analysis — library code is not ours to fix
+  "ruff.exclude": ["**/.venv"],
   // Standard mode is the fallback when no pyrightconfig.json is present in the project
   "python.analysis.typeCheckingMode": "standard",
   "python.analysis.autoImportCompletions": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
   "python.analysis.inlayHints.variableTypes": false,
+  "python.analysis.exclude": ["**/.venv"],
+  // Monokai colors `async`/`def` as storage.type (cyan #66D9EF), indistinguishable from module teal.
+  // Override to pink (#F92672) to match the rest of the keyword palette. Also strip the italic.
+  "editor.tokenColorCustomizations": {
+    "[Darcula Theme from IntelliJ]": {
+      "textMateRules": [
+        // Regular strings → bright green (distinguish from muted olive docstrings)
+        {
+          "scope": [
+            "string.quoted.single.python",
+            "string.quoted.double.python"
+          ],
+          "settings": { "foreground": "#6aad56" }
+        },
+        // None/True/False → blue to signal they're special constants, not plain identifiers
+        {
+          "scope": ["constant.language.python"],
+          "settings": { "foreground": "#569cd6" }
+        },
+        // Keyword argument names in function calls (e.g. `participant=` in `fn(participant=x)`)
+        {
+          "scope": ["variable.parameter.function-call.python"],
+          "settings": { "foreground": "#FFFFFF" }
+        }
+      ]
+    },
+    "[Monokai]": {
+      "textMateRules": [
+        {
+          "scope": [
+            "storage.type.function.python",
+            "storage.type.function.async.python"
+          ],
+          "settings": {
+            "foreground": "#F92672",
+            "fontStyle": ""
+          }
+        }
+      ]
+    }
+  },
+  // Pylance underlines module/namespace tokens by default — remove the underline decoration
+  "editor.semanticTokenColorCustomizations": {
+    "rules": {
+      "module:python": { "foreground": "#4ec9b0", "underline": false },
+      "namespace:python": { "foreground": "#4ec9b0", "underline": false },
+      "class:python": { "foreground": "#569cd6", "underline": false },
+      "type:python": { "foreground": "#569cd6", "underline": false }
+    }
+  },
 
   // ── TypeScript / JavaScript ───────────────────────────────────────────────────
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
 
   // ── JSON / YAML / TOML / Markdown ─────────────────────────────────────────────
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[yaml]": {
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[markdown]": {
     "editor.wordWrap": "on",
     "editor.quickSuggestions": {
       "other": "off",
       "comments": "off",
-      "strings": "off",
-    },
+      "strings": "off"
+    }
+  },
+  // Open .md files directly in preview (reader) mode — Cmd+Shift+V to toggle back to source
+  "workbench.editorAssociations": {
+    "*.md": "vscode.markdown.preview.editor"
   },
 
   // ── Terraform ─────────────────────────────────────────────────────────────────
   "[terraform]": {
     "editor.defaultFormatter": "hashicorp.terraform",
     "editor.formatOnSave": true,
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[terraform-vars]": {
     "editor.defaultFormatter": "hashicorp.terraform",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
 
   // ── GitLens ───────────────────────────────────────────────────────────────────
@@ -168,4 +224,24 @@
   "redhat.telemetry.enabled": false,
   "gitlens.ai.model": "vscode",
   "gitlens.ai.vscode.model": "copilot:gpt-4.1",
+  "claudeCode.preferredLocation": "panel",
+  "window.nativeTabs": true,
+  "claudeCode.allowDangerouslySkipPermissions": true,
+  "claudeCode.enableNewConversationShortcut": true,
+  // Monokai's default background is #272822 (dark olive); override to pure black
+  "workbench.colorCustomizations": {
+    "[Monokai]": {
+      "editor.background": "#000000",
+      "editorGutter.background": "#000000",
+      "editorLineNumber.foreground": "#555555",
+      "sideBar.background": "#1a1a1a",
+      "activityBar.background": "#0a0a0a",
+      "panel.background": "#0a0a0a",
+      "terminal.background": "#000000",
+      "tab.inactiveBackground": "#0a0a0a",
+      "tab.activeBackground": "#000000",
+      "titleBar.activeBackground": "#0a0a0a"
+    }
+  },
+  "workbench.colorTheme": "Darcula Theme from IntelliJ"
 }
