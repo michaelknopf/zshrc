@@ -30,12 +30,16 @@ nefrob.vscode-just-syntax
 usernamehw.errorlens
 tamasfe.even-better-toml
 EditorConfig.EditorConfig
+janisdd.vscode-edit-csv
 
 # GitHub
 github.vscode-github-actions
 
 # Themes
 trinm1709.dracula-theme-from-intellij
+
+# Swift
+swiftlang.swift-vscode
 
 # Markdown
 yzhang.markdown-all-in-one

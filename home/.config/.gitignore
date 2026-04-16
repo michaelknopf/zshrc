@@ -1,0 +1,11 @@
+gcloud
+iterm2/
+flutter/
+gws/
+configstore/
+pip/
+python_keyring/
+uv/uv.toml.backup
+uv/uv.toml
+zed/
+cagent/user-uuid
