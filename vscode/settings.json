@@ -22,7 +22,7 @@
   "editor.formatOnSave": true,
   "editor.formatOnPaste": false,
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "explicit",
+    "source.organizeImports": "explicit"
   },
 
   // ── Files ────────────────────────────────────────────────────────────────────
@@ -39,14 +39,14 @@
     "**/*.pyc": true,
     "**/.DS_Store": true,
     "**/node_modules": true,
-    "**/.terraform": true,
+    "**/.terraform": true
   },
   "files.associations": {
     "*.tf": "terraform",
     "*.tfvars": "terraform",
     "*.hcl": "terraform",
     "Dockerfile.*": "dockerfile",
-    ".env*": "dotenv",
+    ".env*": "dotenv"
   },
 
   // ── Search ───────────────────────────────────────────────────────────────────
@@ -58,10 +58,9 @@
     "**/venv": true,
     "**/.terraform": true,
     "**/coverage": true,
-    "**/*.min.js": true,
+    "**/*.min.js": true
   },
   "workbench.startupEditor": "none",
-  "workbench.editor.enablePreview": true,
   "workbench.editor.tabSizing": "shrink",
   "window.zoomLevel": 1,
   "window.openFoldersInNewWindow": "on",
@@ -94,8 +93,8 @@
     "editor.tabSize": 4,
     "editor.codeActionsOnSave": {
       "source.fixAll": "explicit",
-      "source.organizeImports": "explicit",
-    },
+      "source.organizeImports": "explicit"
+    }
   },
   "ruff.organizeImports": true,
   // Exclude virtualenv and site-packages from linting/analysis — library code is not ours to fix
@@ -115,36 +114,36 @@
         {
           "scope": [
             "string.quoted.single.python",
-            "string.quoted.double.python",
+            "string.quoted.double.python"
           ],
-          "settings": { "foreground": "#6aad56" },
+          "settings": { "foreground": "#6aad56" }
         },
         // None/True/False → blue to signal they're special constants, not plain identifiers
         {
           "scope": ["constant.language.python"],
-          "settings": { "foreground": "#569cd6" },
+          "settings": { "foreground": "#569cd6" }
         },
         // Keyword argument names in function calls (e.g. `participant=` in `fn(participant=x)`)
         {
           "scope": ["variable.parameter.function-call.python"],
-          "settings": { "foreground": "#FFFFFF" },
-        },
-      ],
+          "settings": { "foreground": "#FFFFFF" }
+        }
+      ]
     },
     "[Monokai]": {
       "textMateRules": [
         {
           "scope": [
             "storage.type.function.python",
-            "storage.type.function.async.python",
+            "storage.type.function.async.python"
           ],
           "settings": {
             "foreground": "#F92672",
-            "fontStyle": "",
-          },
-        },
-      ],
-    },
+            "fontStyle": ""
+          }
+        }
+      ]
+    }
   },
   // Pylance underlines module/namespace tokens by default — remove the underline decoration
   "editor.semanticTokenColorCustomizations": {
@@ -152,62 +151,62 @@
       "module:python": { "foreground": "#4ec9b0", "underline": false },
       "namespace:python": { "foreground": "#4ec9b0", "underline": false },
       "class:python": { "foreground": "#569cd6", "underline": false },
-      "type:python": { "foreground": "#569cd6", "underline": false },
-    },
+      "type:python": { "foreground": "#569cd6", "underline": false }
+    }
   },
 
   // ── TypeScript / JavaScript ───────────────────────────────────────────────────
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
 
   // ── JSON / YAML / TOML / Markdown ─────────────────────────────────────────────
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[yaml]": {
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[markdown]": {
     "editor.wordWrap": "on",
     "editor.quickSuggestions": {
       "other": "off",
       "comments": "off",
-      "strings": "off",
-    },
+      "strings": "off"
+    }
   },
   // Open .md files directly in preview (reader) mode — Cmd+Shift+V to toggle back to source
   "workbench.editorAssociations": {
-    "*.md": "vscode.markdown.preview.editor",
+    "*.md": "vscode.markdown.preview.editor"
   },
 
   // ── Terraform ─────────────────────────────────────────────────────────────────
   "[terraform]": {
     "editor.defaultFormatter": "hashicorp.terraform",
     "editor.formatOnSave": true,
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
   "[terraform-vars]": {
     "editor.defaultFormatter": "hashicorp.terraform",
-    "editor.tabSize": 2,
+    "editor.tabSize": 2
   },
 
   // ── GitLens ───────────────────────────────────────────────────────────────────
@@ -226,6 +225,7 @@
   "gitlens.ai.vscode.model": "copilot:gpt-4.1",
   "claudeCode.preferredLocation": "panel",
   "window.nativeTabs": true,
+  "window.title": "${rootName}",
   "claudeCode.allowDangerouslySkipPermissions": true,
   "claudeCode.enableNewConversationShortcut": true,
   // Monokai's default background is #272822 (dark olive); override to pure black
@@ -240,13 +240,13 @@
       "terminal.background": "#000000",
       "tab.inactiveBackground": "#0a0a0a",
       "tab.activeBackground": "#000000",
-      "titleBar.activeBackground": "#0a0a0a",
-    },
+      "titleBar.activeBackground": "#0a0a0a"
+    }
   },
   "workbench.colorTheme": "Darcula Theme from IntelliJ",
   // just-lsp has too many false positives and no inline suppression mechanism;
   // disable it and keep syntax highlighting only
   "vscode-just.lspPath": "",
   "[just]": {},
-  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "workbench.secondarySideBar.defaultVisibility": "hidden"
 }

@@ -60,7 +60,8 @@
     "oracle@oracle": true,
     "pyright-lsp@claude-plugins-official": true,
     "savi@savi-tools": true,
-    "mk@savi-tools": true
+    "mk@savi-tools": true,
+    "frontend-design@claude-code-plugins": true
   },
   "alwaysThinkingEnabled": false,
   "effortLevel": "medium",
