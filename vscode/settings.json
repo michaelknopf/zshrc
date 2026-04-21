@@ -248,5 +248,6 @@
   // disable it and keep syntax highlighting only
   "vscode-just.lspPath": "",
   "[just]": {},
-  "workbench.secondarySideBar.defaultVisibility": "hidden"
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "security.workspace.trust.untrustedFiles": "open"
 }
