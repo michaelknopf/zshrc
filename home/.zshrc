@@ -17,6 +17,7 @@ ZSHRC_SOURCE_FILES=(
     "python.sh"
     "go.sh"
     "node.sh"
+    "android.sh"
     "ngrok.sh"
     "aider.sh"
     "terraform.sh"

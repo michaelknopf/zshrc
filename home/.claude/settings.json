@@ -27,7 +27,6 @@
     "ask": [],
     "defaultMode": "bypassPermissions"
   },
-  "model": "opusplan",
   "hooks": {
     "PreCompact": [
       {
@@ -57,19 +56,33 @@
     "command": "/Users/mknopf/code/github/savi/claude-code-plugins/plugins/mk/scripts/statusline.sh"
   },
   "enabledPlugins": {
-    "oracle@oracle": true,
-    "pyright-lsp@claude-plugins-official": true,
     "savi@savi-tools": true,
-    "mk@savi-tools": true,
-    "frontend-design@claude-code-plugins": true
+    "mk@savi-tools": true
   },
   "alwaysThinkingEnabled": false,
   "effortLevel": "medium",
   "showClearContextOnPlanAccept": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
   "skipDangerousModePermissionPrompt": true,
+  "voiceEnabled": true,
+  "mcpServers": {
+    "langfuse": {
+      "command": "/Users/mknopf/.local/bin/langfuse-mcp",
+      "args": [],
+      "env": {
+        "LANGFUSE_PUBLIC_KEY": "pk-lf-5ec014c9-4868-4342-aec9-ed27dedf88e2",
+        "LANGFUSE_SECRET_KEY": "sk-lf-b6dbe95a-9fef-4c74-aefb-be68bfee8477",
+        "LANGFUSE_BASE_URL": "https://us.cloud.langfuse.com"
+      }
+    }
+  },
   "allowedTools": [
     "Search",
     "Read",
     "WebSearch"
-  ]
+  ],
+  "model": "opus"
 }

@@ -31,6 +31,9 @@ export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
 # See: /Users/mknopf/.claude/docs/notes/session-2026-01-27-claude-code-startup-optimization.md
 export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 
+# Use 1m context window with Sonnet by default
+#export ANTHROPIC_DEFAULT_SONNET_MODEL='claude-sonnet-4-6[1m]'
+
 # Use Bedrock as the provider for Claude Code
 alias claude-bedrock='CLAUDE_CODE_USE_BEDROCK=1 ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-4-6 ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4-6 AWS_PROFILE=play-sso-power claude'
 
