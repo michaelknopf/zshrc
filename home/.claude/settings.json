@@ -27,6 +27,7 @@
     "ask": [],
     "defaultMode": "bypassPermissions"
   },
+  "model": "opus",
   "hooks": {
     "PreCompact": [
       {
@@ -57,7 +58,16 @@
   },
   "enabledPlugins": {
     "savi@savi-tools": true,
-    "mk@savi-tools": true
+    "mk@savi-tools": true,
+    "pyright-lsp@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "marimo-pair": {
+      "source": {
+        "source": "github",
+        "repo": "marimo-team/marimo-pair"
+      }
+    }
   },
   "alwaysThinkingEnabled": false,
   "effortLevel": "medium",
@@ -68,21 +78,9 @@
   },
   "skipDangerousModePermissionPrompt": true,
   "voiceEnabled": true,
-  "mcpServers": {
-    "langfuse": {
-      "command": "/Users/mknopf/.local/bin/langfuse-mcp",
-      "args": [],
-      "env": {
-        "LANGFUSE_PUBLIC_KEY": "pk-lf-5ec014c9-4868-4342-aec9-ed27dedf88e2",
-        "LANGFUSE_SECRET_KEY": "sk-lf-b6dbe95a-9fef-4c74-aefb-be68bfee8477",
-        "LANGFUSE_BASE_URL": "https://us.cloud.langfuse.com"
-      }
-    }
-  },
   "allowedTools": [
     "Search",
     "Read",
     "WebSearch"
-  ],
-  "model": "opus"
+  ]
 }

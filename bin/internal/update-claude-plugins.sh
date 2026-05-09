@@ -7,10 +7,12 @@ echo "Updating all marketplaces..."
 claude plugin marketplace update
 
 echo "\nUpdating installed plugins..."
-# Parse 'claude plugin list --json' to extract plugin IDs
-claude plugin list --json | jq -r '.[].id' | while read -r plugin; do
-    echo "Updating $plugin..."
-    claude plugin update "$plugin"
+# Parse 'claude plugin list --json' for each plugin's id and scope, since
+# `claude plugin update` defaults to --scope user and fails for plugins
+# installed at other scopes (project, local, managed).
+claude plugin list --json | jq -r '.[] | "\(.id)\t\(.scope)"' | while IFS=$'\t' read -r plugin scope; do
+    echo "Updating $plugin (scope: $scope)..."
+    claude plugin update --scope "$scope" "$plugin"
 done
 
 echo "\nAll marketplaces and plugins updated successfully!"
