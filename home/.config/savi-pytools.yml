@@ -40,3 +40,10 @@ codeartifact:
   account: infra
 ecr:
   account: infra
+slack:
+  display_name: Michael Knopf
+  icon_emoji: ":rick-drool:"
+  # default_channel intentionally unset — require --channel explicitly
+  # team_id intentionally unset — slackTeamId is not yet wired through flock's CDK
+  # (see SlackNotifyStack.slackTeamId), so deep links stay workspace-generic
+  # until that env var is populated in deployments.

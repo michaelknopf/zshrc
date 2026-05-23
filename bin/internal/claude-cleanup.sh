@@ -5,17 +5,17 @@ set -euo pipefail
 #
 # Claude Code accumulates conversation histories, debug logs, file backups, and
 # session metadata in ~/.claude/. This script deletes files older than N days
-# (default: 3) from the high-impact directories while preserving functional state
+# (default: 14) from the high-impact directories while preserving functional state
 # (plugins, settings, caches, and recent sessions).
 #
 # Usage:
 #   claude-cleanup.sh [--days N] [--dry-run]
 #
 # Flags:
-#   --days N    Delete files older than N days (default: 3)
+#   --days N    Delete files older than N days (default: 14)
 #   --dry-run   Show what would be deleted (with sizes) without deleting anything
 
-DAYS=3
+DAYS=14
 DRY_RUN=false
 
 while [[ $# -gt 0 ]]; do
