@@ -18,5 +18,5 @@ mkdir -p "$HOME/.terraform.d/plugin-cache"
 # location. Without this, each `live/<stack>/` gets its own copy of the
 # rendered module source plus its own `.terraform/` (compounding with the
 # provider cache savings above).
-export TERRAGRUNT_DOWNLOAD="$HOME/.cache/terragrunt"
-mkdir -p "$TERRAGRUNT_DOWNLOAD"
+export TG_DOWNLOAD_DIR="$HOME/.cache/terragrunt"
+mkdir -p "$TG_DOWNLOAD_DIR"
