@@ -13,6 +13,14 @@ export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
 #   - Automatic version update checks
 #   - Error reporting to Anthropic
 #   - Bug command functionality
+#   - Feature-flag (GrowthBook) evaluation
+#
+# Side effect: disabling feature-flag evaluation also disables Remote Control
+# (driving this session from the claude.ai web/mobile app), since that feature
+# is gated behind a feature flag. `/doctor` will show Remote Control as disabled
+# with "disabled by CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC" — this is expected,
+# not a bug. To use Remote Control in a one-off session, launch with:
+#   env -u CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC claude
 #
 # Impact: Reduces startup time from ~4.5s to ~3.0s (30% faster, saves ~1.5s)
 #

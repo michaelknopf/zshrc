@@ -3,7 +3,7 @@ alias gph="git push -u origin HEAD"
 # overwrites alias for 'git commit -v -a'
 alias gca="git commit --amend --no-edit"
 
-alias gp='git pull --recurse-submodules'
+alias gp='git pull --recurse-submodules --force --tags'
 
 alias gcp="gaa && gca && gpf"
 

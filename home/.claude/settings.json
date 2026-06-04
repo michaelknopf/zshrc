@@ -27,7 +27,6 @@
     "ask": [],
     "defaultMode": "bypassPermissions"
   },
-  "model": "opus",
   "hooks": {
     "PreCompact": [
       {
