@@ -12,6 +12,7 @@ ZSHRC_SOURCE_FILES=(
     "path.sh"        # Initialize PATH first
     "zsh.sh"         # Zsh completions, etc.
     "oh_my_zsh.sh"   # Load Oh My Zsh
+    "iterm.sh"       # iTerm2 session-name = git repo root basename (after OMZ)
     "git.sh"         # Git aliases (optional)
     "direnv.sh"
     "python.sh"
@@ -45,3 +46,6 @@ zstyle ':completion:*' menu select
 # IDK how this got here, maybe something auto added it?
 # TODO: Remove if we're not having issues in after a few days.
 #fpath+=~/.zfunc; autoload -Uz compinit; compinit
+
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
