@@ -40,6 +40,25 @@ codeartifact:
   account: infra
 ecr:
   account: infra
+deploy:
+  # Repos scanned by `savi-deploy status`. name = table label, path = local clone.
+  repos:
+  - name: flock
+    path: ~/code/github/savi/flock
+  - name: Scamwise
+    path: ~/code/github/savi/scamwise-service
+  - name: Phony
+    path: ~/code/github/savi/phony
+  - name: re-scam
+    path: ~/code/github/savi/re-scam
+  - name: user
+    path: ~/code/github/savi/user
+  - name: voice-agent
+    path: ~/code/github/savi/voice-agent
+  - name: db
+    path: ~/code/github/savi/db
+  - name: scamwise-ui
+    path: ~/code/github/savi/scamwise-ui
 slack:
   display_name: Michael Knopf
   icon_emoji: ":rick-drool:"
