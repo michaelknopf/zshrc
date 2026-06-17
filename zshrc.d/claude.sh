@@ -37,13 +37,52 @@ export CLAUDE_CODE_DISABLE_TERMINAL_TITLE=1
 #   - Aggressive ~/.claude/ cleanup (2.3GB → 845MB, improves I/O)
 #
 # See: /Users/mknopf/.claude/docs/notes/session-2026-01-27-claude-code-startup-optimization.md
-export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+#
+# DISABLED 2026-06-15: This flag turns off GrowthBook feature-flag evaluation, and the
+# Channels research-preview feature (used by AIM for session-to-session
+# messaging — see the `cl` alias below) is gated behind those flags. With the flag set,
+# launching a channel session reports "--dangerously-load-development-channels ignored /
+# Channels are not currently available": the channel TOOLS still work, but the inbound
+# push direction is dead, so peer messages never reach the session. The same gate also
+# disables Remote Control (noted above). Re-enabling feature-flag evaluation (i.e.
+# leaving this unset) costs ~1.5s of startup time but is required for channels to work.
+# Re-enable the export if you stop using channels/Remote Control and want the speed back.
+#export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
 
 # Use 1m context window with Sonnet by default
 #export ANTHROPIC_DEFAULT_SONNET_MODEL='claude-sonnet-4-6[1m]'
 
 # Use Bedrock as the provider for Claude Code
 alias claude-bedrock='CLAUDE_CODE_USE_BEDROCK=1 ANTHROPIC_DEFAULT_OPUS_MODEL=claude-opus-4-6 ANTHROPIC_DEFAULT_SONNET_MODEL=claude-sonnet-4-6 AWS_PROFILE=play-sso-power claude'
+
+# `aim` — start a Claude session wired into AIM (AOL Instant Messenger for AI sessions),
+# so it can talk to other `aim` sessions (see ~/code/github/savi/aim).
+#
+# The `aim` MCP server is registered USER-SCOPED in ~/.claude.json (top-level mcpServers),
+# so every session already has the AIM tools (send_to_peer, list_peers, …) — no
+# --mcp-config needed here. This alias only adds the launch-time flag that enables the
+# INBOUND push direction: --dangerously-load-development-channels server:aim makes peer
+# messages arrive as <channel> events. (That's a launch concern, not an MCP-config one,
+# which is why it lives on the command line rather than in ~/.claude.json.)
+#
+# No --dangerously-skip-permissions needed: bypassPermissions is already the default in
+# ~/.claude/settings.json. Extra args append, so `aim --resume`, `aim -p '...'`, etc. work.
+#
+# Pin a fixed name with `AIM_PEER=alice aim` (inherited by the aim-server subprocess).
+# Unset, sessions auto-name (brave-fox); rename via the set_name tool.
+#
+# Channels require GrowthBook feature-flag evaluation, which is why the
+# CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC export above is commented out — see that note.
+# With that flag set, channels report "not currently available" and inbound peer messages
+# silently never reach the session.
+#
+# Prereq: the broker must be running once: `cd ~/code/github/savi/aim && uv run aim-broker`
+# (leave it in a spare terminal). If it isn't up, sessions still start fine — they just log
+# a failed registration and get no inbound push until it's running.
+#
+# SECURITY: any bridged peer message can run tools in your session (bypassPermissions +
+# localhost broker, no auth) — keep it local-only.
+alias aim='claude --dangerously-load-development-channels server:aim'
 
 # Another option is to put this JSON in .claude/settings.json
 #"env": {
