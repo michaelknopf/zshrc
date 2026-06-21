@@ -2,3 +2,5 @@
 
 # Activate the nearest venv or .venv going up the directory tree
 alias acv="source $ZSHRC_ROOT/bin/internal/activate_venv.sh"
+
+alias uvup='uv sync --all-packages --all-groups --upgrade'

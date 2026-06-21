@@ -71,6 +71,11 @@ alias claude-bedrock='CLAUDE_CODE_USE_BEDROCK=1 ANTHROPIC_DEFAULT_OPUS_MODEL=cla
 # Pin a fixed name with `AIM_PEER=alice aim` (inherited by the aim-server subprocess).
 # Unset, sessions auto-name (brave-fox); rename via the set_name tool.
 #
+# AIM_STATUSLINE=1 is exported so the status line (mk plugin) shows this session's AIM
+# peer name as `aim:<name>`. The status-line lookup is OFF by default everywhere else; only
+# `aim` sessions opt in, so plain `claude` sessions never pay the broker-lookup cost. The
+# lookup is a single short-timeout curl to the local broker and tolerates any failure.
+#
 # Channels require GrowthBook feature-flag evaluation, which is why the
 # CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC export above is commented out — see that note.
 # With that flag set, channels report "not currently available" and inbound peer messages
@@ -82,7 +87,7 @@ alias claude-bedrock='CLAUDE_CODE_USE_BEDROCK=1 ANTHROPIC_DEFAULT_OPUS_MODEL=cla
 #
 # SECURITY: any bridged peer message can run tools in your session (bypassPermissions +
 # localhost broker, no auth) — keep it local-only.
-alias aim='claude --dangerously-load-development-channels server:aim'
+alias aim='AIM_STATUSLINE=1 claude --dangerously-load-development-channels server:aim'
 
 # Another option is to put this JSON in .claude/settings.json
 #"env": {
