@@ -37,6 +37,34 @@ while [[ $# -gt 0 ]]; do
 done
 
 CLAUDE_DIR="${HOME}/.claude"
+PIN_FILE="${CLAUDE_PIN_FILE:-${CLAUDE_DIR}/pinned.jsonl}"
+
+# ---------------------------------------------------------------------------
+# Pinned-session protection
+# ---------------------------------------------------------------------------
+
+# Session ids the user has pinned (via the mk plugin's pin.sh / `cpin`). Their
+# transcripts and session dirs must never be pruned, no matter how old. Read
+# once into a global array used to build `find` exclusion clauses below.
+typeset -ga PINNED_IDS
+PINNED_IDS=()
+if [[ -f "$PIN_FILE" ]] && command -v jq >/dev/null 2>&1; then
+  PINNED_IDS=("${(@f)$(jq -r '.id // empty' "$PIN_FILE" 2>/dev/null)}")
+fi
+
+# Build a `find` exclusion array into the named variable: for each pinned id,
+# `-not -name <id><suffix>`. Session ids are UUIDs (no spaces/globs), so plain
+# array elements are safe. Leaves the array empty when nothing is pinned, so the
+# find commands run unchanged in that case.
+# Args: out_array_name, suffix
+build_pinned_exclusions() {
+  local out="$1" suffix="$2" id
+  local -a acc=()
+  for id in "${PINNED_IDS[@]}"; do
+    [[ -n "$id" ]] && acc+=(-not -name "${id}${suffix}")
+  done
+  set -A "$out" "${acc[@]}"
+}
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -99,14 +127,21 @@ else
 fi
 
 # 1. projects/ — conversation JSONL files and UUID session directories
-#    Preserve: sessions-index.json, CLAUDE.md, settings.json, project dirs themselves.
+#    Preserve: sessions-index.json, CLAUDE.md, settings.json, project dirs themselves,
+#    and any session the user has pinned (excluded by id, regardless of age).
+build_pinned_exclusions PIN_JSONL_EXCL '.jsonl'   # -not -name <id>.jsonl ...
+build_pinned_exclusions PIN_DIR_EXCL   ''         # -not -name <id> ...
+if [[ ${#PINNED_IDS[@]} -gt 0 ]]; then
+  echo "  [protecting ${#PINNED_IDS[@]} pinned session(s) from pruning]"
+fi
+
 run_cleanup \
   "projects/*.jsonl conversation files" \
-  "${CLAUDE_DIR}/projects/" -name '*.jsonl' -mtime "+${DAYS}"
+  "${CLAUDE_DIR}/projects/" -name '*.jsonl' "${PIN_JSONL_EXCL[@]}" -mtime "+${DAYS}"
 
 run_cleanup_dirs \
   "projects/ UUID session directories" \
-  "${CLAUDE_DIR}/projects/" -mindepth 2 -maxdepth 2 -mtime "+${DAYS}"
+  "${CLAUDE_DIR}/projects/" -mindepth 2 -maxdepth 2 "${PIN_DIR_EXCL[@]}" -mtime "+${DAYS}"
 
 # 2. debug/ — verbose debug logs; the `latest` symlink is not a regular file so
 #    `-type f` naturally excludes it.
