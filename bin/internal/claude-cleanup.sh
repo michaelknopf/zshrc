@@ -1,6 +1,39 @@
 #!/usr/bin/env zsh
 set -euo pipefail
 
+# ============================================================================
+# DISABLED 2026-07-05 — superseded by Claude Code's built-in `cleanupPeriodDays`.
+#
+# This script existed because early Claude Code did not prune ~/.claude/, so a
+# bloated projects/ directory slowed startup and exit (see
+# home/.claude/docs/notes/session-2026-01-27-claude-code-startup-optimization.md).
+#
+# Claude Code now ships `cleanupPeriodDays` (settings.json), which at startup
+# deletes old data from projects/*.jsonl AND tool-results, file-history, debug,
+# plans, paste-cache, image-cache, session-env, tasks, shell-snapshots, backups —
+# a SUPERSET of what this script covered. We set `cleanupPeriodDays: 30` in
+# home/.claude/settings.json (aggressive junk cleanup), so this cron is redundant.
+#
+# It is kept (not deleted) for reference and in case per-directory retention or
+# between-session thinning is ever wanted again — neither of which the built-in
+# supports. To reactivate: remove the guard below, and set Disabled=false (or
+# delete the <Disabled/> key) in plist/com.mknopf.claude-cleanup.xml, then
+# `launchctl load` it.
+#
+# PIN PROTECTION: `cleanupPeriodDays` is a single global retention with NO pin
+# awareness — it reaps pinned sessions too. We keep the window aggressive (30)
+# and protect pins a different way: the mk plugin archives pinned transcripts to
+# ~/.local/share/claude-pins/ (outside ~/.claude, so this cleanup can't touch
+# them) via a SessionEnd hook + a daily job, and restores them on resume. So the
+# pin-protection once added to THIS script (reading ~/.claude/pinned.jsonl) is
+# obsolete — it only ever guarded this cron, never the built-in cleanup.
+# ============================================================================
+if [[ "${CLAUDE_CLEANUP_FORCE:-0}" != "1" ]]; then
+  echo "claude-cleanup is disabled (superseded by cleanupPeriodDays). " \
+       "Set CLAUDE_CLEANUP_FORCE=1 to run anyway." >&2
+  exit 0
+fi
+
 # Prune old Claude Code data to reclaim disk space and speed up startup.
 #
 # Claude Code accumulates conversation histories, debug logs, file backups, and
@@ -9,7 +42,7 @@ set -euo pipefail
 # (plugins, settings, caches, and recent sessions).
 #
 # Usage:
-#   claude-cleanup.sh [--days N] [--dry-run]
+#   CLAUDE_CLEANUP_FORCE=1 claude-cleanup.sh [--days N] [--dry-run]
 #
 # Flags:
 #   --days N    Delete files older than N days (default: 14)
