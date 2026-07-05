@@ -59,7 +59,8 @@
     "savi@savi-tools": true,
     "mk@savi-tools": true,
     "pyright-lsp@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true
+    "frontend-design@claude-plugins-official": true,
+    "firebase@firebase": true
   },
   "extraKnownMarketplaces": {
     "marimo-pair": {
@@ -67,17 +68,34 @@
         "source": "github",
         "repo": "marimo-team/marimo-pair"
       }
+    },
+    "superwhisper": {
+      "source": {
+        "source": "github",
+        "repo": "superultrainc/superwhisper-claude-code"
+      }
+    },
+    "firebase": {
+      "source": {
+        "source": "github",
+        "repo": "firebase/firebase-tools"
+      }
     }
   },
   "alwaysThinkingEnabled": false,
   "effortLevel": "high",
   "showClearContextOnPlanAccept": true,
+  "tui": "default",
   "voice": {
     "enabled": true,
     "mode": "hold"
   },
+  "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
   "remoteControlAtStartup": true,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
   "voiceEnabled": true,
   "allowedTools": [
     "Search",

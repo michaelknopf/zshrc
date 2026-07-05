@@ -11,3 +11,6 @@
 /home/.junie/instances/
 
 /zshrc.d/private.sh
+
+# git worktrees created by `savi-git worktree`
+.worktrees/
