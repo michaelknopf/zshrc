@@ -10,6 +10,9 @@ export PNPM_HOME="/Users/mknopf/Library/pnpm"
 typeset -ga ZSHRC_PATH_ARRAY
 ZSHRC_PATH_ARRAY=(
     "$ZSHRC_ROOT/bin"       # this repo's bin folder
+    # mk plugin's bin — provides `cpin` (session pinning). See the mk plugin's
+    # install.sh; kept here so cpin is on PATH without running that installer.
+    "$HOME/code/github/savi/claude-code-plugins/plugins/mk/bin"
     "$HOME/.local/bin"
     "$HOME/bin"
     "$HOME/go/bin"
