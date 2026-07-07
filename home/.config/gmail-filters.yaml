@@ -1,0 +1,265 @@
+# gmail-filters config — declarative Gmail label/filter automation.
+#
+# Consumed by the mk plugin's gmail-filters.py (the /mk:gmail-filters command).
+# Installed to ~/.config/gmail-filters.yaml; the script also honors $GMAIL_FILTERS_CONFIG.
+#
+# Multi-account: keyed by the managed email address under `accounts`. The script reads the
+# active account from `gws auth status` and applies ONLY that account's stanza, so filters
+# can never land in the wrong mailbox. To manage another address, add a sibling stanza.
+#
+# Each filter: criteria (Gmail filter criteria — from/to/subject/query/...), labels (1+,
+# nested via "/"), and optional archive/markRead. Prefer `query: "list:(<list-id>)"` for
+# mailing lists, and sender+subject patterns that match a recurring TEMPLATE over a bare
+# `from:` (a bare-sender filter is barely better than a search).
+
+accounts:
+  michael@savisecurity.com:
+    filters:
+      - criteria:
+          from: no_reply@email.apple.com
+          subject: submission is complete
+        labels:
+          - Apple/App Review
+      - criteria:
+          from: no_reply@email.apple.com
+          subject: issue with your
+        labels:
+          - Apple/App Review
+      - criteria:
+          from: testflight_no_reply@email.apple.com
+        labels:
+          - Apple/TestFlight
+      - criteria:
+          query: list:(<aws.savisecurity.com>)
+          subject: Upcoming routine retirement of your AWS Elastic Container Service tasks running on AWS Fargate
+        labels:
+          - AWS
+        archive: true
+      - criteria:
+          query: list:(<aws.savisecurity.com>)
+          subject: 'Amazon Web Services: You have opened a new Support case'
+        labels:
+          - AWS/AWS Support
+      - criteria:
+          query: list:(<aws.savisecurity.com>)
+          subject: Customer Added Communication
+        labels:
+          - AWS/AWS Support
+      - criteria:
+          query: list:(<aws.savisecurity.com>) messages from AWS Support
+        labels:
+          - AWS/AWS Support
+      - criteria:
+          query: list:(<billing.savisecurity.com>)
+        labels:
+          - billing
+      - criteria:
+          from: michael@savisecurity.com
+          subject: Daily Meeting Summary
+        labels:
+          - Digest
+        archive: true
+      - criteria:
+          from: michael@savisecurity.com
+          subject: Day-Ahead Agenda Pack
+        labels:
+          - Digest
+        archive: true
+      - criteria:
+          from: firebase-noreply@google.com
+          subject: Blaze pricing plan
+        labels:
+          - Firebase/Billing
+      - criteria:
+          from: firebase-noreply@google.com
+          subject: is ready to test
+        labels:
+          - Firebase/Build Ready
+      - criteria:
+          from: firebase-noreply@google.com
+          subject: Missing dSYM
+        labels:
+          - Firebase/Missing dSYM
+      - criteria:
+          from: cloudplatform-noreply@google.com
+          subject: '[Action Advised]'
+        labels:
+          - GCP/Action Advised
+      - criteria:
+          from: cloudplatform-noreply@google.com
+          subject: '[Product Update]'
+        labels:
+          - GCP/Product Update
+      - criteria:
+          from: gemini-notes@google.com
+        labels:
+          - Gemini Notes
+        archive: true
+      - criteria:
+          from: notifications@github.com
+        labels:
+          - GitHub
+      - criteria:
+          query: list:(<data-lab.savisec.github.com>)
+        labels:
+          - GitHub/data-lab
+      - criteria:
+          query: list:(<infra-terraform.savisec.github.com>)
+        labels:
+          - GitHub/infra-terraform
+      - criteria:
+          query: list:(<savi-phony-svc.savisec.github.com>)
+        labels:
+          - GitHub/phony-svc
+      - criteria:
+          query: list:(<savi-pypack.savisec.github.com>)
+        labels:
+          - GitHub/pypack
+      - criteria:
+          query: list:(<savi-pytools.savisec.github.com>)
+        labels:
+          - GitHub/pytools
+      - criteria:
+          query: list:(<scamwise-service.savisec.github.com>)
+        labels:
+          - GitHub/scamwise
+      - criteria:
+          query: list:(<sw-scraper.savisec.github.com>)
+        labels:
+          - GitHub/sw-scraper
+      - criteria:
+          query: list:(<savi-user-svc.savisec.github.com>)
+        labels:
+          - GitHub/user-svc
+      - criteria:
+          query: list:(<voice-agent.savisec.github.com>)
+        labels:
+          - GitHub/voice-agent
+      - criteria:
+          from: comments-noreply@docs.google.com
+        labels:
+          - Google Docs
+      - criteria:
+          from: notifications@linear.app
+        labels:
+          - Linear
+      - criteria:
+          from: ryan@savisecurity.com
+          subject: Twice-Weekly Strategy & Market Intelligence Digest
+        labels:
+          - newsletters
+      - criteria:
+          from: no-reply@otter.ai
+        labels:
+          - Otter
+      - criteria:
+          from: no-reply@pagerduty.com
+        labels:
+          - PagerDuty
+      - criteria:
+          from: hey@posthog.com
+          subject: Error tracking weekly digest
+        labels:
+          - PostHog/Error Digest
+      - criteria:
+          from: hey@posthog.com
+          subject: accepted their PostHog invitation
+        labels:
+          - PostHog/Invites
+      - criteria:
+          from: hey@posthog.com
+          subject: new device logged into your account
+        labels:
+          - PostHog/Security
+      - criteria:
+          from: communications@ramp.com
+        labels:
+          - Ramp
+      - criteria:
+          from: billing@customer.io
+        labels:
+          - Receipt
+      - criteria:
+          from: invoice+statements+acct_1M07hSLmdOdiMXBs@stripe.com
+        labels:
+          - Receipt
+      - criteria:
+          from: invoice+statements+acct_1OJWYaKELsPJ4kaD@stripe.com
+          subject: Tavily
+        labels:
+          - Receipt
+        archive: true
+      - criteria:
+          from: invoice+statements@mail.anthropic.com
+        labels:
+          - Receipt
+      - criteria:
+          query: list:(<admin.savisecurity.com>)
+          subject: '[GitHub] Payment Receipt'
+        labels:
+          - Receipt
+      - criteria:
+          from: postmaster@whoisjson.com
+          subject: invoice
+        labels:
+          - Receipt
+      - criteria:
+          from: receipts@openrouter.ai
+        labels:
+          - Receipt
+      - criteria:
+          from: system@sent-via.netsuite.com
+          subject: Grafana Invoice
+        labels:
+          - Receipt
+      - criteria:
+          from: invoice+statements+acct_1OJWYaKELsPJ4kaD@stripe.com
+          query: Your receipt from Tavily
+        labels:
+          - Receipt
+      - criteria:
+          query: list:(<alpha.savisecurity.com>)
+        labels:
+          - Savi/alpha
+      - criteria:
+          query: list:(<hello.savisecurity.com>)
+        labels:
+          - Savi/hello
+      - criteria:
+          query: list:(<support.savisecurity.com>)
+        labels:
+          - Savi/support
+      - criteria:
+          from: noreply@statuspage.io
+          subject: Incident
+        labels:
+          - Statuspage/Incidents
+      - criteria:
+          from: telnyx.com
+          subject: campaign
+        labels:
+          - Telnyx/Campaigns
+      - criteria:
+          from: telnyx.com
+          subject: Low Balance
+        labels:
+          - Telnyx/Low Balance
+      - criteria:
+          from: telnyx.com
+          subject: Order
+        labels:
+          - Telnyx/Orders
+      - criteria:
+          from: telnyx.com
+          subject: Payment Success
+        labels:
+          - Telnyx/Payment
+      - criteria:
+          from: notifications@github.com
+          query: '"linear[bot] left a comment"'
+        labels: []
+        archive: true
+      - criteria:
+          from: codecov[bot]
+        labels: []
+        archive: true
