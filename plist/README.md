@@ -41,4 +41,5 @@ launchctl load ~/Library/LaunchAgents/<name>.plist
 ## Current Agents
 
 - `com.mknopf.kill-orphaned-claude.xml` - Periodically kills orphaned Claude processes that have been re-parented to launchd
-- `com.mknopf.claude-cleanup.xml` - Deletes Claude conversation history, debug logs, and session data older than 14 days to reclaim disk space (runs daily)
+- `com.mknopf.claude-cleanup.xml` - Deletes Claude conversation history, debug logs, and session data older than 14 days to reclaim disk space (runs daily). **Disabled** — superseded by Claude Code's built-in `cleanupPeriodDays`.
+- `com.mknopf.savi-login-refresh.xml` - Re-mints the CodeArtifact + ECR bearer tokens every 6h via the savi-device Secure Enclave cert, so `uv sync` / npm / `docker pull` never stop to ask for auth (runs `savi-login --skip-aws-sso`)

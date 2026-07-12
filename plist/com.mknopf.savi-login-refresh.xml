@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Keeps the CodeArtifact + ECR bearer tokens fresh so `uv sync`, npm, and docker
+  pull never stop to ask for auth.
+
+  This only became schedulable once savi-login could mint those tokens from the
+  savi-device Secure Enclave cert (`--skip-aws-sso`) instead of a browser SSO
+  session — an unattended job cannot click through SSO.
+
+  6h interval against a ~12h token life: one missed tick still leaves a valid
+  token. RunAtLoad covers login, so a fresh boot is never the stale case.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.mknopf.savi-login-refresh</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/mknopf/code/github/michaelknopf/zshrc/bin/internal/savi-login-refresh.sh</string>
+    </array>
+    <key>StartInterval</key>
+    <integer>21600</integer>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>StandardOutPath</key>
+    <string>/tmp/savi-login-refresh.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/savi-login-refresh.log</string>
+</dict>
+</plist>
