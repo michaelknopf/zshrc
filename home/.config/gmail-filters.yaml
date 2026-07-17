@@ -263,3 +263,50 @@ accounts:
           from: codecov[bot]
         labels: []
         archive: true
+      - criteria:
+          from: no-reply@accounts.google.com
+          subject: Security alert
+        labels:
+          - Google/Security
+      - criteria:
+          from: notifications@savi-security.intercom-mail.com
+        labels:
+          - Intercom
+      - criteria:
+          from: email.figma.com
+        labels:
+          - Figma
+      - criteria:
+          from: payments-noreply@google.com
+        labels:
+          - Google/Payments
+      - criteria:
+          from: noreply@business-updates.facebook.com
+          subject: Your Meta ads receipt
+        labels:
+          - Receipt
+      - criteria:
+          from: stripe.com
+          subject: receipt
+        labels:
+          - Receipt
+      - criteria:
+          from: drive-shares-dm-noreply@google.com
+        labels:
+          - Google Drive/Shares
+      - criteria:
+          from: noreply-play-console@google.com
+        labels:
+          - Google/Play Console
+      - criteria:
+          from: sc-noreply@google.com
+        labels:
+          - Google/Play Console
+      - criteria:
+          from: noreply@auth.savisecurity.com
+        labels:
+          - Savi/auth
+      - criteria:
+          from: notify@updates.notion.so
+        labels:
+          - Notion
