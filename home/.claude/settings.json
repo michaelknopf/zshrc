@@ -28,30 +28,7 @@
     "ask": [],
     "defaultMode": "bypassPermissions"
   },
-  "hooks": {
-    "PreCompact": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bd prime --stealth"
-          }
-        ]
-      }
-    ],
-    "SessionStart": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bd prime --stealth"
-          }
-        ]
-      }
-    ]
-  },
+  "hooks": {},
   "statusLine": {
     "type": "command",
     "command": "/Users/mknopf/code/github/savi/claude-code-plugins/plugins/mk/scripts/statusline.sh"
