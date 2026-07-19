@@ -61,6 +61,7 @@
       }
     }
   },
+  "awaySummaryEnabled": true,
   "alwaysThinkingEnabled": false,
   "effortLevel": "high",
   "showClearContextOnPlanAccept": true,

@@ -38,14 +38,36 @@ user_preferences:
   - ecr
 codeartifact:
   account: infra
-  # Cert-backed (Roles Anywhere + Secure Enclave) instead of SSO, so token minting
-  # works with no browser and no session. Pair with `savi-login --skip-aws-sso`.
-  profile_override: device-infra
+  profile_override: infra-device-read
+  repos:
+  - name: pypi-test
+    tools:
+    - uv
+  - name: pypi-release
+    tools:
+    - uv
+  - name: npm-test
+    tools:
+    - npm
+  - name: npm-release
+    tools:
+    - npm
+  - name: maven-test
+    tools:
+    - mvn
+  - name: maven-release
+    tools:
+    - mvn
+  - name: swift-test
+    tools:
+    - swift
+  - name: swift-release
+    tools:
+    - swift
 ecr:
   account: infra
-  profile_override: device-infra
+  profile_override: infra-device-read
 deploy:
-  # Repos scanned by `savi-deploy status`. name = table label, path = local clone.
   repos:
   - name: flock
     path: ~/code/github/savi/flock
@@ -64,12 +86,6 @@ deploy:
   - name: scamwise-ui
     path: ~/code/github/savi/scamwise-ui
 slack:
+  profile_override: test-device-elevated
   display_name: Michael Knopf
-  icon_emoji: ":rick-drool:"
-  # Cert-backed publish (browser-free). Must be an -elevated profile: the
-  # events:PutEvents grant lives in savi-device-elevated, not savi-device-read.
-  profile_override: device-test-elevated
-  # default_channel intentionally unset — require --channel explicitly
-  # team_id intentionally unset — slackTeamId is not yet wired through flock's CDK
-  # (see SlackNotifyStack.slackTeamId), so deep links stay workspace-generic
-  # until that env var is populated in deployments.
+  icon_emoji: ':rick-drool:'
