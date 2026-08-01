@@ -2,10 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <!--
-  Hourly 8am-11pm. launchd uses local time, so these hours track Pacific (incl. DST) on
-  this machine. The script self-guards: it exits immediately if the sweep already
-  succeeded today, so at most one real sweep runs per day. See bin/internal/gmail-sweep.sh
-  for why the schedule is opportunistic rather than a single fixed time.
+  TEMPORARY (2026-08-01): StartInterval of 300s while observing the job in the wild.
+  The intended schedule is StartCalendarInterval at Hour 8..23, Minute 0 — hourly across
+  waking hours, local time so it tracks Pacific incl. DST. Restore that and drop
+  StartInterval when the observation window is over.
+
+  Either way the script self-guards: it exits immediately if the sweep already succeeded
+  today, so at most one real sweep runs per day and the extra firings are cheap no-ops.
+  See bin/internal/gmail-sweep.sh for why the schedule is opportunistic at all.
 
   No RunAtLoad — a sweep archives mail, and login is not a reason to trigger one.
 -->
@@ -22,25 +26,8 @@
         <key>PATH</key>
         <string>/Users/mknopf/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
     </dict>
-    <key>StartCalendarInterval</key>
-    <array>
-        <dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>9</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>10</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>11</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>12</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>13</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>14</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>15</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>16</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>17</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>18</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>19</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>21</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>22</integer><key>Minute</key><integer>0</integer></dict>
-        <dict><key>Hour</key><integer>23</integer><key>Minute</key><integer>0</integer></dict>
-    </array>
+    <key>StartInterval</key>
+    <integer>300</integer>
     <key>StandardOutPath</key>
     <string>/tmp/gmail-sweep-launchd.log</string>
     <key>StandardErrorPath</key>
