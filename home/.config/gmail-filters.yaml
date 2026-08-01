@@ -75,6 +75,12 @@ accounts:
           subject: is ready to test
         labels:
           - Firebase/Build Ready
+        archive: true
+      - criteria:
+          from: firebase-noreply@google.com
+          subject: Trending stability issues
+        labels:
+          - Firebase/Stability
       - criteria:
           from: firebase-noreply@google.com
           subject: Missing dSYM
@@ -188,7 +194,6 @@ accounts:
           subject: Tavily
         labels:
           - Receipt
-        archive: true
       - criteria:
           from: invoice+statements@mail.anthropic.com
         labels:
@@ -284,7 +289,7 @@ accounts:
           from: noreply@business-updates.facebook.com
           subject: Your Meta ads receipt
         labels:
-          - Receipt
+          - Receipt/Meta Ads Receipt
       - criteria:
           from: stripe.com
           subject: receipt
@@ -310,3 +315,180 @@ accounts:
           from: notify@updates.notion.so
         labels:
           - Notion
+      - criteria:
+          from: support@ipqualityscore.com
+          subject: Out Of Credits
+        labels:
+          - quota alerts
+        archive: true
+      - criteria:
+          from: hello@livekit.io
+          subject: Usage alert
+        labels:
+          - quota alerts
+      - criteria:
+          from: portal@telnyx.com
+          subject: 'Notice: surcharges'
+        labels:
+          - Telnyx/Notices
+      - criteria:
+          from: portal@telnyx.com
+          subject: Rate Update
+        labels:
+          - Telnyx/Notices
+      - criteria:
+          from: portal@telnyx.com
+          subject: New Comment on Advanced Order
+        labels:
+          - Telnyx/Orders
+      - criteria:
+          from: portal@telnyx.com
+          subject: Advanced Order Status Change
+        labels:
+          - Telnyx/Orders
+      - criteria:
+          from: analytics-noreply@google.com
+          subject: performance report is in
+        labels:
+          - Google/Analytics
+      - criteria:
+          from: no-reply@ats.rippling.com
+          subject: please submit your feedback on
+        labels:
+          - Hiring
+      - criteria:
+          from: meetings-noreply@google.com
+        labels:
+          - Gemini Notes
+        archive: true
+      - criteria:
+          from: calendar-notification@google.com
+          subject: 'Accepted:'
+        labels:
+          - updates
+        archive: true
+      - criteria:
+          from: mailer-daemon@googlemail.com
+          subject: Delivery Status Notification
+        labels:
+          - updates
+      - criteria:
+          from: appleid@id.apple.com
+          subject: Verify your email or phone number
+        labels:
+          - Apple
+      - criteria:
+          from: appleid@id.apple.com
+          subject: Apple Account information has been updated
+        labels:
+          - Apple
+      - criteria:
+          from: town.com
+          subject: Briefing
+        labels:
+          - Town/briefings
+      - criteria:
+          from: stripe.com
+          subject: subscription will renew soon
+        labels:
+          - Receipt/Upcoming
+      - criteria:
+          from: startups@customer.io
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: googlecloud@google.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: discover@telnyx.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: noreply@email.openai.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: alex.nucci@firecrawl.dev
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: swteam@email.signalwire.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: contactcloud@google.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: ads-noreply@google.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: noreply@twilio.com
+          subject: account has been recharged
+        labels:
+          - Receipt
+      - criteria:
+          from: sales.us@jetbrains.com
+          subject: Subscription Pack
+        labels:
+          - Receipt
+      - criteria:
+          from: no-reply@rippling.com
+          subject: You just got paid
+        labels:
+          - Payroll
+      - criteria:
+          from: workspace-noreply@google.com
+          subject: Thanks for setting up billing
+        labels:
+          - Google/Payments
+      - criteria:
+          from: cloudplatform-noreply@google.com
+          subject: '[Action Required]'
+        labels:
+          - GCP/Action Advised
+      - criteria:
+          from: admin@savisecurity.com
+          subject: 'Action Required: Account to be marked Dormant'
+        labels:
+          - Savi
+      - criteria:
+          from: notification@facebookmail.com
+        labels:
+          - updates
+      - criteria:
+          from: danielasgari@google.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: michael.p.knopf@gmail.com
+          subject: 'Accepted:'
+        labels:
+          - updates
+        archive: true
+    sweep:
+      label: Delayed Archive
+      days: 7
+      queries:
+        - from:communications@ramp.com
+        - label:Receipt
+        - label:"Receipt/Meta Ads Receipt"
+        - label:"Receipt/Upcoming"
+        - label:Intercom
+        - label:"Telnyx/Payment"
+        - label:"Telnyx/Notices"
+        - label:"Telnyx/Orders"
+        - label:"Telnyx/Low Balance"
+        - label:"quota alerts"
+        - label:"Apple/App Review"
