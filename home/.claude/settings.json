@@ -61,9 +61,9 @@
       }
     }
   },
-  "awaySummaryEnabled": true,
   "alwaysThinkingEnabled": false,
   "effortLevel": "high",
+  "awaySummaryEnabled": true,
   "showClearContextOnPlanAccept": true,
   "tui": "default",
   "voice": {
@@ -73,6 +73,7 @@
   "autoMemoryEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "skipWorkflowUsageWarning": true,
+  "theme": "dark",
   "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,

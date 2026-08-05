@@ -295,6 +295,14 @@ accounts:
           subject: receipt
         labels:
           - Receipt
+      # Teammate-forwarded vendor receipts, for reimbursement. The `Fwd` term is load-bearing:
+      # without it this also swallows vendor receipts relayed via the billing@ group, which are
+      # company spend, not reimbursements.
+      - criteria:
+          from: savisecurity.com
+          subject: Fwd Your receipt from
+        labels:
+          - Receipt/Forwarded
       - criteria:
           from: drive-shares-dm-noreply@google.com
         labels:
@@ -485,6 +493,7 @@ accounts:
         - label:Receipt
         - label:"Receipt/Meta Ads Receipt"
         - label:"Receipt/Upcoming"
+        - label:"Receipt/Forwarded"
         - label:Intercom
         - label:"Telnyx/Payment"
         - label:"Telnyx/Notices"

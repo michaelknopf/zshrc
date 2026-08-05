@@ -97,3 +97,5 @@ alias aim='AIM_STATUSLINE=1 claude --dangerously-load-development-channels serve
 #    "ANTHROPIC_DEFAULT_OPUS_MODEL": "global.anthropic.claude-opus-4-6-v1",
 #    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
 #},
+
+export CLAUDE_CODE_DISABLE_AGENT_VIEW=1
