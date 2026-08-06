@@ -8,7 +8,8 @@ pip/
 python_keyring/
 uv/uv.toml.backup
 uv/uv.toml
-zed/
+zed/*
+!zed/settings.json
 cagent/user-uuid
 1Password/
 mise/
