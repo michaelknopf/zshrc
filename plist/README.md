@@ -40,7 +40,6 @@ launchctl load ~/Library/LaunchAgents/<name>.plist
 
 ## Current Agents
 
-- `com.mknopf.kill-orphaned-claude.xml` - Periodically kills orphaned Claude processes that have been re-parented to launchd
 - `com.mknopf.claude-cleanup.xml` - Deletes Claude conversation history, debug logs, and session data older than 14 days to reclaim disk space (runs daily). **Disabled** — superseded by Claude Code's built-in `cleanupPeriodDays`.
 - `com.mknopf.gmail-sweep.xml` - Runs the Gmail delayed-archive sweep every 15 minutes, 8am-11pm. Fires that often because `gws` credentials expire daily and the sweep needs an hour that follows a manual `gws_auth`; the script no-ops once it has succeeded for the day. Logs to `/tmp/gmail-sweep.log`.
 
