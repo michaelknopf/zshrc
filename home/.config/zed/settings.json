@@ -26,7 +26,11 @@
     "trust_all_worktrees": true
   },
   "agent": {
-    "notify_when_agent_waiting": "never"
+    "notify_when_agent_waiting": "never",
+    // Keep the agent panel off the left dock, which the project panel owns.
+    // Sharing a dock means Zed restores whichever was active last, so the
+    // agent panel would reopen on startup.
+    "dock": "right"
   },
   "agent_servers": {
     "claude-acp": {
