@@ -7,10 +7,13 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "terminal": {
+    "font_size": 15.0
+  },
+  "cli_default_open_behavior": "existing_window",
   "edit_predictions": {
     "allow_data_collection": "no"
   },
-  "show_edit_predictions": false,
   "project_panel": {
     "dock": "left",
     "bold_folder_labels": true
@@ -22,6 +25,9 @@
   "session": {
     "trust_all_worktrees": true
   },
+  "agent": {
+    "notify_when_agent_waiting": "never"
+  },
   "agent_servers": {
     "claude-acp": {
       "type": "registry"
@@ -32,10 +38,12 @@
     "light": "Material Icon Theme",
     "dark": "Material Icon Theme"
   },
+  "agent_buffer_font_family": "Helvetica Neue",
+  "agent_buffer_font_size": 15,
   "use_system_window_tabs": true,
   "base_keymap": "JetBrains",
   "ui_font_size": 16,
-  "buffer_font_size": 15,
+  "buffer_font_size": 16.0,
   "theme": {
     "mode": "dark",
     "light": "Ayu Light",

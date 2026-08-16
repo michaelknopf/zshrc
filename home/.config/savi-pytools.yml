@@ -46,6 +46,7 @@ codeartifact:
   - name: pypi-release
     tools:
     - uv
+    - pip
   - name: npm-test
     tools:
     - npm
