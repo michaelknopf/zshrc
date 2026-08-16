@@ -10,6 +10,7 @@ uv/uv.toml.backup
 uv/uv.toml
 zed/*
 !zed/settings.json
+!zed/keymap.json
 cagent/user-uuid
 1Password/
 mise/

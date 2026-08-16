@@ -1,0 +1,17 @@
+// Zed keymap — overrides on top of the JetBrains base keymap.
+//
+// See https://zed.dev/docs/key-bindings
+// Use `dev: open key context view` from the command palette to inspect
+// which contexts are active at the cursor.
+[
+  {
+    // Zed binds cmd-shift-c to the collab panel globally, so the Copy Path
+    // shortcut advertised in the project panel's context menu does nothing
+    // when focus is in an editor.
+    "context": "Editor",
+    "bindings": {
+      "cmd-shift-c": "editor::CopyPath",
+      "cmd-shift-alt-c": "editor::CopyRelativePath"
+    }
+  }
+]
