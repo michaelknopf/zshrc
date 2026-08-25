@@ -34,12 +34,12 @@
     "command": "/Users/mknopf/code/github/savi/claude-code-plugins/plugins/mk/scripts/statusline.sh"
   },
   "enabledPlugins": {
-    "savi@savi-tools": true,
-    "mk@savi-tools": true,
     "pyright-lsp@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true,
     "firebase@firebase": true,
-    "figma@claude-plugins-official": true
+    "figma@claude-plugins-official": true,
+    "savi@savi-live": true,
+    "mk@savi-live": true
   },
   "extraKnownMarketplaces": {
     "marimo-pair": {
@@ -58,6 +58,12 @@
       "source": {
         "source": "github",
         "repo": "firebase/firebase-tools"
+      }
+    },
+    "savi-live": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/mknopf/.claude/local-marketplaces/savi-live"
       }
     }
   },
