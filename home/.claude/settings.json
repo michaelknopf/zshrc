@@ -28,6 +28,7 @@
     "ask": [],
     "defaultMode": "bypassPermissions"
   },
+  "crossSessionInbound": "accept",
   "hooks": {},
   "statusLine": {
     "type": "command",
