@@ -14,3 +14,10 @@
 
 # git worktrees created by `savi-git worktree`
 .worktrees/
+
+# python project virtualenvs
+/python/*/.venv/
+
+# python bytecode caches
+__pycache__/
+*.py[cod]

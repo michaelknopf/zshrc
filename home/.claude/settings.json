@@ -28,16 +28,15 @@
     "ask": [],
     "defaultMode": "bypassPermissions"
   },
-  "crossSessionInbound": "accept",
   "hooks": {},
   "statusLine": {
     "type": "command",
     "command": "/Users/mknopf/code/github/savi/claude-code-plugins/plugins/mk/scripts/statusline.sh"
   },
   "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": false,
     "frontend-design@claude-plugins-official": true,
-    "firebase@firebase": true,
+    "firebase@firebase": false,
     "figma@claude-plugins-official": true,
     "savi@savi-live": true,
     "mk@savi-live": true
@@ -82,6 +81,7 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "remoteControlAtStartup": true,
+  "crossSessionInbound": "accept",
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "voiceEnabled": true,

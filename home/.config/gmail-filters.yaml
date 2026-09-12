@@ -485,6 +485,263 @@ accounts:
         labels:
           - updates
         archive: true
+      - criteria:
+          from: noreply@business-updates.facebook.com
+          subject: was approved
+        labels:
+          - Meta Ads/Approvals
+        archive: true
+      - criteria:
+          from: no-reply@rippling.com
+          subject: You have pending tasks
+        labels:
+          - Rippling/Tasks
+        archive: true
+      - criteria:
+          from: noreply@test.pypi.org
+        labels:
+          - TestPyPI
+        archive: true
+      - criteria:
+          from: no-reply-eventsatgoogle@google.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: no-reply@rippling.com
+          subject: has enrolled you in
+        labels:
+          - Rippling/Tasks
+      - criteria:
+          from: no-reply@rippling.com
+          subject: task was recently assigned to you
+        labels:
+          - Rippling/Tasks
+      - criteria:
+          from: hey@posthog.com
+          subject: Data Pipeline Failures Alert
+        labels:
+          - PostHog/Alerts
+      - criteria:
+          from: hey@posthog.com
+          subject: '[Alert]'
+        labels:
+          - PostHog/Alerts
+      - criteria:
+          from: hey@posthog.com
+          subject: $set and $set_once
+        labels:
+          - PostHog/Deprecations
+      - criteria:
+          from: alerts@notifications.firecrawl.dev
+          subject: of your Firecrawl credits
+        labels:
+          - quota alerts
+      - criteria:
+          from: support@ipqualityscore.com
+          subject: of your monthly credits
+        labels:
+          - quota alerts
+      - criteria:
+          from: billing@zoom.us
+          subject: AI usage limit has been reset
+        labels:
+          - quota alerts
+      - criteria:
+          from: notifications@town.com
+          subject: out of Town credits
+        labels:
+          - Town/quota alerts
+      - criteria:
+          from: failed-payments@stripe.com
+        labels:
+          - Receipt/Failed Payments
+      - criteria:
+          from: support@maxmind.com
+        labels:
+          - MaxMind
+      - criteria:
+          from: support+notifications@figma.com
+          subject: You can now view
+        labels:
+          - Figma
+      - criteria:
+          from: developer@insideapple.apple.com
+        labels:
+          - Apple
+      - criteria:
+          query: list:(<scamwise-ui.savisec.github.com>)
+        labels:
+          - GitHub/scamwise-ui
+      - criteria:
+          query: list:(<savi-rn-app.savisec.github.com>)
+        labels:
+          - GitHub/rn-app
+      - criteria:
+          query: list:(<github-terraform.savisec.github.com>)
+        labels:
+          - GitHub/github-terraform
+      - criteria:
+          query: list:(<savi-ios-app.savisec.github.com>)
+        labels:
+          - GitHub/ios-app
+      - criteria:
+          query: list:(<savi-android-app.savisec.github.com>)
+        labels:
+          - GitHub/android-app
+      - criteria:
+          query: list:(<developer.savisecurity.com>)
+        labels:
+          - Savi/developer
+      - criteria:
+          query: has:attachment filename:invite.ics
+        labels:
+          - Calendar
+      - criteria:
+          from: no-reply@rippling.com
+          subject: Confirm whether
+        labels:
+          - Rippling/Tasks
+      - criteria:
+          from: notifications@link.com
+          subject: transaction summary is ready
+        labels:
+          - Receipt
+      - criteria:
+          from: jmg-newsletter@mail.beehiiv.com
+        labels:
+          - newsletters
+        archive: true
+      - criteria:
+          from: zeno@updates.resend.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: news@jetbrains.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: no-reply@excalidraw.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: trial-ending@excalidraw.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: googleforstartups-noreply@google.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: ads-account-noreply@google.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: team@send.intercom.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: info@cluecon.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: legal@customer.io
+        labels:
+          - updates
+      - criteria:
+          from: chromewebstore-noreply@google.com
+        labels:
+          - Google/Play Console
+      - criteria:
+          from: noreply@registrar.amazon
+        labels:
+          - AWS
+      - criteria:
+          from: invoices+re65hzqf5r2vsu2@tabsplatform.com
+        labels:
+          - billing
+      - criteria:
+          from: savisecurity@aircfo.com
+        labels:
+          - billing
+      - criteria:
+          from: marc@updates.langfuse.com
+        labels:
+          - updates
+      - criteria:
+          from: tavily.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: chaigun@airbridge.io
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: sara@posthog.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: eric@firecrawl.dev
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: sales@jetbrains.com
+          subject: AI credits are now available
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: no-reply@signalwire.com
+          subject: Low Balance Warning
+        labels:
+          - quota alerts
+      - criteria:
+          query: subject:(Moderator spam report)
+        labels:
+          - Savi/moderation
+        archive: true
+      - criteria:
+          from: developer@savisecurity.com
+          query: Claude OR Anthropic
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          query: subject:(Actions minutes OR Actions storage)
+        labels:
+          - quota alerts
+      - criteria:
+          from: aws@savisecurity.com
+          subject: '[Action may be required]'
+        labels:
+          - AWS
+      - criteria:
+          from: jeandenis@corp.town.com
+        labels:
+          - Town/marketing
+        archive: true
+      - criteria:
+          from: noreply@mail.dev.savisecurity.com
+          subject: Confirm your email address
+        labels:
+          - Savi/auth
+      - criteria:
+          from: hello@savisecurity.com
+          subject: 'Savi Security:'
+        labels:
+          - Google/Play Console
     sweep:
       label: Delayed Archive
       days: 7
@@ -501,3 +758,35 @@ accounts:
         - label:"Telnyx/Low Balance"
         - label:"quota alerts"
         - label:"Apple/App Review"
+        - label:GitHub
+        - label:"Firebase/Missing dSYM"
+        - label:"Google/Security"
+        - label:"Apple/TestFlight"
+        - label:Figma
+        - label:"Google Docs"
+        - label:"Google Drive/Shares"
+        - label:"Rippling/Tasks"
+        - label:"PostHog/Alerts"
+        - label:MaxMind
+        - label:"Receipt/Failed Payments"
+        - label:Calendar
+
+        - label:"Firebase/Stability"
+        - label:Linear
+        - label:"Google/Payments"
+        - label:Payroll
+        - label:Apple
+        - label:billing
+        - label:newsletters
+        - label:marketing
+        - label:updates
+        - label:"Meta Ads/Approvals"
+        - label:TestPyPI
+        - label:"Google/Play Console"
+        - label:AWS
+        - label:"PostHog/Deprecations"
+
+        - label:"Savi/moderation"
+
+        - label:"Savi/auth"
+        - label:"Town/marketing"
