@@ -99,3 +99,13 @@ alias aim='AIM_STATUSLINE=1 claude --dangerously-load-development-channels serve
 #},
 
 export CLAUDE_CODE_DISABLE_AGENT_VIEW=1
+
+# Suppress the `tengu_toasty_thimble` "batching_reminder" that Claude Code splices in
+# after tool results: "First privately list what you need next; then request every item
+# that doesn't depend on another's result in this one response." There is no private
+# channel to hold that list when extended thinking is off, so it surfaces as a
+# "Privately, ..." preamble on nearly every tool-using response.
+#
+# A blank value resolves to "disabled" ahead of the built-in default; unsetting this
+# restores the reminder.
+export CLAUDE_CODE_TOASTY_THIMBLE=" "
