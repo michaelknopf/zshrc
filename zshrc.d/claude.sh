@@ -99,3 +99,15 @@ alias aim='AIM_STATUSLINE=1 claude --dangerously-load-development-channels serve
 #},
 
 export CLAUDE_CODE_DISABLE_AGENT_VIEW=1
+
+# Suppress the injected "batching_reminder" ("First privately list what you need
+# next; then request every item that doesn't depend on another's result in this one
+# response."). With extended thinking off there is no private channel to hold that
+# list, so it surfaces as a "Privately, ..." preamble on tool-using responses. The
+# same reminder also correlates with false-positive `reasoning_extraction` refusals
+# in subagents — see anthropics/claude-code#88364.
+#
+# Also set in home/.claude/settings.json, which covers launch paths that never source
+# this file (the desktop app). Either one alone is sufficient.
+export CLAUDE_CODE_TOASTY_THIMBLE=0
+export CLAUDE_CODE_GENTLE_PARASOL=0
