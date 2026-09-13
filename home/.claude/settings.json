@@ -1,5 +1,9 @@
 {
   "cleanupPeriodDays": 30,
+  "env": {
+    "CLAUDE_CODE_TOASTY_THIMBLE": "0",
+    "CLAUDE_CODE_GENTLE_PARASOL": "0"
+  },
   "permissions": {
     "allow": [
       "WebFetch",
