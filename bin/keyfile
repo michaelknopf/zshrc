@@ -1,0 +1,177 @@
+#!/usr/bin/env bash
+# Central store for low-sensitivity, frequently-rotated API keys.
+# Store format: KEY=value lines, divided into groups by `# [group]` headers.
+# Keys above the first header belong to the implicit group "default".
+set -euo pipefail
+
+KEYFILE="${KEYFILE_PATH:-$HOME/.local/share/agent-keys/keys.env}"
+
+die() { printf 'keyfile: %s\n' "$1" >&2; exit 1; }
+
+require_store() {
+    [[ -f "$KEYFILE" ]] || die "no key store at $KEYFILE (run 'keyfile init')"
+    # A world- or group-readable store is a misconfiguration worth stopping on,
+    # not a warning someone scrolls past.
+    local mode
+    mode=$(stat -f '%OLp' "$KEYFILE")
+    [[ "$mode" == "600" ]] || die "$KEYFILE has mode $mode, expected 600 (run: chmod 600 \"$KEYFILE\")"
+}
+
+# Emits `group<TAB>key<TAB>value` for every entry, which every subcommand filters.
+parse_store() {
+    awk '
+        /^[[:space:]]*#[[:space:]]*\[.*\][[:space:]]*$/ {
+            group = $0
+            sub(/^[[:space:]]*#[[:space:]]*\[/, "", group)
+            sub(/\][[:space:]]*$/, "", group)
+            next
+        }
+        /^[[:space:]]*#/ || /^[[:space:]]*$/ { next }
+        {
+            line = $0
+            sub(/^[[:space:]]*export[[:space:]]+/, "", line)
+            eq = index(line, "=")
+            if (eq == 0) next
+            key = substr(line, 1, eq - 1)
+            val = substr(line, eq + 1)
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", key)
+            # Strip one matching pair of surrounding quotes, if present.
+            if (val ~ /^".*"$/ || val ~ /^'"'"'.*'"'"'$/)
+                val = substr(val, 2, length(val) - 2)
+            printf "%s\t%s\t%s\n", (group == "" ? "default" : group), key, val
+        }
+    ' "$KEYFILE"
+}
+
+# Shell-quotes a value so `eval` of our output is safe for any byte in it.
+sh_quote() { printf "'%s'" "${1//\'/\'\\\'\'}"; }
+
+select_groups() {
+    local groups=("$@") entries
+    entries=$(parse_store)
+    if [[ ${#groups[@]} -eq 0 ]]; then
+        printf '%s\n' "$entries"
+        return
+    fi
+    local g found out=""
+    for g in "${groups[@]}"; do
+        found=$(printf '%s\n' "$entries" | awk -F'\t' -v g="$g" '$1 == g')
+        [[ -n "$found" ]] || die "no such group: $g (see 'keyfile groups')"
+        out+="$found"$'\n'
+    done
+    printf '%s' "$out"
+}
+
+cmd_init() {
+    if [[ -f "$KEYFILE" ]]; then
+        printf 'keyfile: store already exists at %s\n' "$KEYFILE"
+        return
+    fi
+    mkdir -p "$(dirname "$KEYFILE")"
+    chmod 700 "$(dirname "$KEYFILE")"
+    cat > "$KEYFILE" <<'EOF'
+# API keys for local development and agent use.
+# Low-sensitivity only: rotated frequently, with usage caps and scoped permissions.
+# Group keys with `# [group]` headers; read them with `keyfile get|env|run`.
+
+# [example]
+EXAMPLE_API_KEY=replace-me
+EOF
+    chmod 600 "$KEYFILE"
+    printf 'keyfile: created %s\n' "$KEYFILE"
+}
+
+cmd_get() {
+    [[ $# -eq 1 ]] || die "usage: keyfile get <KEY>"
+    require_store
+    local val
+    val=$(parse_store | awk -F'\t' -v k="$1" '$2 == k { print $3; exit }')
+    [[ -n "$val" ]] || die "no such key: $1 (see 'keyfile list')"
+    printf '%s\n' "$val"
+}
+
+cmd_list() {
+    require_store
+    if [[ $# -eq 0 ]]; then
+        parse_store | awk -F'\t' '{ printf "%-32s %s\n", $2, $1 }' | sort
+    else
+        select_groups "$@" | awk -F'\t' 'NF { print $2 }' | sort
+    fi
+}
+
+cmd_groups() {
+    require_store
+    parse_store | awk -F'\t' '{ print $1 }' | sort -u
+}
+
+cmd_env() {
+    require_store
+    select_groups "$@" | while IFS=$'\t' read -r _ key val; do
+        [[ -n "$key" ]] || continue
+        printf 'export %s=%s\n' "$key" "$(sh_quote "$val")"
+    done
+}
+
+cmd_run() {
+    local groups=()
+    while [[ $# -gt 0 && "$1" != "--" ]]; do
+        groups+=("$1")
+        shift
+    done
+    [[ "${1:-}" == "--" ]] || die "usage: keyfile run [group...] -- <command> [args...]"
+    shift
+    [[ $# -gt 0 ]] || die "usage: keyfile run [group...] -- <command> [args...]"
+    require_store
+
+    local assignments=()
+    while IFS=$'\t' read -r _ key val; do
+        [[ -n "$key" ]] || continue
+        assignments+=("$key=$val")
+    done < <(select_groups "${groups[@]+"${groups[@]}"}")
+
+    exec env "${assignments[@]}" "$@"
+}
+
+cmd_edit() {
+    require_store
+    "${EDITOR:-vi}" "$KEYFILE"
+    chmod 600 "$KEYFILE"
+}
+
+cmd_path() { printf '%s\n' "$KEYFILE"; }
+
+usage() {
+    cat <<EOF
+keyfile — central store for low-sensitivity API keys
+
+  keyfile get <KEY>                 print one value
+  keyfile list [group...]           print key names (no values)
+  keyfile groups                    print group names
+  keyfile env [group...]            print 'export K=V' lines for eval
+  keyfile run [group...] -- <cmd>   run <cmd> with those keys in its environment
+  keyfile edit                      open the store in \$EDITOR
+  keyfile init                      create an empty store
+  keyfile path                      print the store's location
+
+Store: $KEYFILE
+EOF
+}
+
+main() {
+    local cmd="${1:-}"
+    [[ $# -gt 0 ]] && shift || true
+    case "$cmd" in
+        get)    cmd_get "$@" ;;
+        list)   cmd_list "$@" ;;
+        groups) cmd_groups "$@" ;;
+        env)    cmd_env "$@" ;;
+        run)    cmd_run "$@" ;;
+        edit)   cmd_edit "$@" ;;
+        init)   cmd_init "$@" ;;
+        path)   cmd_path "$@" ;;
+        ""|-h|--help|help) usage ;;
+        *)      die "unknown command: $cmd (try 'keyfile --help')" ;;
+    esac
+}
+
+main "$@"
