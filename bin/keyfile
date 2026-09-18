@@ -15,6 +15,7 @@ require_store() {
     local mode
     mode=$(stat -f '%OLp' "$KEYFILE")
     [[ "$mode" == "600" ]] || die "$KEYFILE has mode $mode, expected 600 (run: chmod 600 \"$KEYFILE\")"
+    parse_store | assert_no_conflicts
 }
 
 # Emits `group<TAB>key<TAB>value` for every entry, which every subcommand filters.
@@ -60,6 +61,14 @@ select_groups() {
         out+="$found"$'\n'
     done
     printf '%s' "$out"
+}
+
+# One key bound to two different values resolves inconsistently — `get` would
+# take the first and `env`/`run` the last — so refuse rather than pick.
+assert_no_conflicts() {
+    local conflict
+    conflict=$(awk -F'\t' 'NF { if ($2 in seen && seen[$2] != $3) print $2 } { seen[$2] = $3 }' | sort -u)
+    [[ -z "$conflict" ]] || die "key defined with conflicting values: $(tr '\n' ' ' <<<"$conflict")(fix in $KEYFILE)"
 }
 
 cmd_init() {
