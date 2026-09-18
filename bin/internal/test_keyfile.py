@@ -170,6 +170,39 @@ class KeyfileTest(unittest.TestCase):
         self.run_kf('edit', EDITOR=str(sloppy))
         self.assertEqual(self.store.stat().st_mode & 0o777, 0o600)
 
+    def test_edit_restores_permissions_after_rename_save(self) -> None:
+        """The mechanism the chmod exists for: a new inode carrying umask perms."""
+        self.write('# [g]\nK=v\n')
+        renamer = Path(self.tmp.name) / 'renamer'
+        renamer.write_text('#!/bin/sh\ncat "$1" > "$1.new"\nmv "$1.new" "$1"\n')
+        renamer.chmod(0o755)
+        self.run_kf('edit', EDITOR=str(renamer))
+        self.assertEqual(self.store.stat().st_mode & 0o777, 0o600)
+
+    def test_edit_opens_a_store_that_fails_validation(self) -> None:
+        self.write('# [a]\nS=one\n\n# [b]\nS=two\n', mode=0o644)
+        marker = Path(self.tmp.name) / 'marker'
+        editor = Path(self.tmp.name) / 'fixer'
+        editor.write_text(f'#!/bin/sh\ntouch {marker}\nprintf "# [a]\\nS=one\\n" > "$1"\n')
+        editor.chmod(0o755)
+        self.run_kf('edit', EDITOR=str(editor))
+        self.assertTrue(marker.exists(), 'edit must open a store needing repair')
+        self.assertEqual(self.store.stat().st_mode & 0o777, 0o600)
+
+    def test_edit_reports_cleanly_when_store_is_gone(self) -> None:
+        self.write('# [g]\nK=v\n')
+        deleter = Path(self.tmp.name) / 'deleter'
+        deleter.write_text('#!/bin/sh\nrm -f "$1"\n')
+        deleter.chmod(0o755)
+        got = self.run_kf('edit', EDITOR=str(deleter))
+        self.assertEqual(got.returncode, 1)
+        self.assertNotIn('Traceback', got.stderr)
+
+    def test_edit_without_a_store_is_an_error(self) -> None:
+        got = self.run_kf('edit', EDITOR='true')
+        self.assertEqual(got.returncode, 1)
+        self.assertIn('no key store', got.stderr)
+
     # --- misc ---------------------------------------------------------------
 
     def test_list_never_prints_values(self) -> None:

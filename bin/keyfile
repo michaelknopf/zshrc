@@ -168,10 +168,16 @@ def cmd_run(args: argparse.Namespace) -> None:
 
 
 def cmd_edit(_args: argparse.Namespace) -> None:
+    # Deliberately no load(): a store that fails validation — loose perms, or a
+    # conflicting key — is exactly the one needing an edit, so checking here
+    # would lock the user out of the only command that repairs it.
     path = store_path()
-    load()
+    if not path.is_file():
+        die(f"no key store at {path} (run 'keyfile init')")
     editor = os.environ.get('EDITOR', 'vi')
     completed = subprocess.run([*shlex.split(editor), str(path)])
+    if not path.is_file():
+        die(f'{path} is gone after editing; the store was not saved')
     # An editor that saves by rename can leave a fresh file with default perms.
     path.chmod(0o600)
     sys.exit(completed.returncode)
