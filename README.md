@@ -18,6 +18,25 @@ A well-organized Zsh configuration. The main `~/.zshrc` is intended to be a syml
 └── setup.sh       Creates symlinks for ~/.zshrc and ~/.zshenv
 ```
 
+## API keys
+
+Low-sensitivity API keys (rotated often, usage-capped) live in a single store outside this repo, at `~/.local/share/agent-keys/keys.env`, mode `600`. `bin/keyfile` reads it; `zshrc.d/private.sh` loads the ambient groups into interactive shells.
+
+The store is a `.env` file divided into groups by `# [group]` headers:
+
+```sh
+keyfile list                     # every key name and its group, no values
+keyfile list notion              # just that group's key names
+keyfile get NOTION_TOKEN         # one value
+keyfile run notion -- ./script   # run with just that group's keys in the environment
+eval "$(keyfile env notion)"     # load into the current shell
+keyfile edit                     # add or rotate a key
+```
+
+Projects should never hold copies of key values. Give a project a `.envrc` with `eval "$(keyfile env <group>)"`, or invoke it through `keyfile run`.
+
+Set `KEYFILE_PATH` to point at a different store (used by tests).
+
 ## Setup
 
 ### Quick start (recommended)
