@@ -13,7 +13,7 @@ Subcommands:
   env [group...]            print 'export K=V' lines for eval
   run [group...] -- <cmd>   run <cmd> with those keys in its environment
   edit                      open the store in $EDITOR
-  init                      create an empty store
+  init                      create a store from a starter template
   path                      print the store's location
 
 Values are for keys that are rotated often, usage-capped and permission-scoped;
@@ -141,7 +141,7 @@ def cmd_list(args: argparse.Namespace) -> None:
             print(key)
     else:
         for key, group in sorted({(e.key, e.group) for e in entries}):
-            print(f'{key:<32} {group}')
+            print(f'{key}\t{group}')
 
 
 def cmd_groups(_args: argparse.Namespace) -> None:
@@ -224,7 +224,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_run.set_defaults(func=cmd_run, command=[])
 
     sub.add_parser('edit', help='open the store in $EDITOR').set_defaults(func=cmd_edit)
-    sub.add_parser('init', help='create an empty store').set_defaults(func=cmd_init)
+    sub.add_parser(
+        'init', help='create a store from a starter template'
+    ).set_defaults(func=cmd_init)
     sub.add_parser('path', help="print the store's location").set_defaults(func=cmd_path)
     return parser
 

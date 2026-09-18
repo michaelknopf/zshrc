@@ -25,7 +25,8 @@ Low-sensitivity API keys (rotated often, usage-capped) live in a single store ou
 The store is a `.env` file divided into groups by `# [group]` headers:
 
 ```sh
-keyfile list                     # key names and their groups, no values
+keyfile list                     # every key name and its group, no values
+keyfile list notion              # just that group's key names
 keyfile get NOTION_TOKEN         # one value
 keyfile run notion -- ./script   # run with just that group's keys in the environment
 eval "$(keyfile env notion)"     # load into the current shell

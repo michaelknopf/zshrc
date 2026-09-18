@@ -71,7 +71,14 @@ class KeyfileTest(unittest.TestCase):
 
     def test_list_without_group_shows_group_column(self) -> None:
         self.write('# [a]\nK=1\n')
-        self.assertIn('a', self.run_kf('list').stdout)
+        self.assertEqual(self.run_kf('list').stdout, 'K\ta\n')
+
+    def test_list_columns_survive_a_long_key(self) -> None:
+        """Tab-separated so `cut -f1` holds for keys of any length."""
+        self.write('# [g]\nA_VERY_LONG_KEY_NAME_THAT_EXCEEDS_THIRTYTWO=1\n')
+        self.assertEqual(
+            self.run_kf('list').stdout, 'A_VERY_LONG_KEY_NAME_THAT_EXCEEDS_THIRTYTWO\tg\n'
+        )
 
     # --- quoting / injection ------------------------------------------------
 
