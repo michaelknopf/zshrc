@@ -7,6 +7,10 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "markdown_preview": {
+    "max_width": 1300.0,
+    "limit_content_width": true
+  },
   "terminal": {
     "font_size": 15.0
   },

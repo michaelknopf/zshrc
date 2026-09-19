@@ -249,5 +249,6 @@
   "vscode-just.lspPath": "",
   "[just]": {},
   "workbench.secondarySideBar.defaultVisibility": "hidden",
-  "security.workspace.trust.untrustedFiles": "open"
+  "security.workspace.trust.untrustedFiles": "open",
+  "security.promptForLocalFileProtocolHandling": false
 }

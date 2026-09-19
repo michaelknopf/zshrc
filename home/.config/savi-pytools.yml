@@ -86,6 +86,8 @@ deploy:
     path: ~/code/github/savi/db
   - name: scamwise-ui
     path: ~/code/github/savi/scamwise-ui
+  - name: harbor
+    path: ~/code/github/savi/harbor
 slack:
   profile_override: test-device-elevated
   display_name: Michael Knopf
