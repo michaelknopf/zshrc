@@ -98,7 +98,10 @@ alias aim='AIM_STATUSLINE=1 claude --dangerously-load-development-channels serve
 #    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "global.anthropic.claude-haiku-4-5-20251001-v1:0"
 #},
 
-export CLAUDE_CODE_DISABLE_AGENT_VIEW=1
+# Disabling the agent view also disables `claude agents`, `attach` and `stop` --
+# the only way to leave a session running and walk away from the terminal. Without
+# them the sole exit is /exit, which ends the session and archives it in the app.
+# export CLAUDE_CODE_DISABLE_AGENT_VIEW=1
 
 # Suppress the injected "batching_reminder" ("First privately list what you need
 # next; then request every item that doesn't depend on another's result in this one
