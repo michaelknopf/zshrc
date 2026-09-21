@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  Keeps a `claude rc` host running so sessions started from the Claude desktop
+  and mobile apps run on this machine instead of in a cloud sandbox.
+
+  KeepAlive restarts the host when it exits, including the exit that happens
+  when the machine wakes with a dropped connection. Sessions the host was
+  running do not survive that restart -- launchd protects the host, not the
+  conversations.
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.mknopf.claude-rc-host</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/mknopf/code/github/michaelknopf/zshrc/bin/internal/claude-rc-host.sh</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <!-- Without this, a crash loop restarts as fast as the process can fail. -->
+    <key>ThrottleInterval</key>
+    <integer>30</integer>
+    <key>ProcessType</key>
+    <string>Interactive</string>
+    <key>StandardOutPath</key>
+    <string>/tmp/claude-rc-host.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/claude-rc-host.log</string>
+</dict>
+</plist>
