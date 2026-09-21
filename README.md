@@ -20,7 +20,7 @@ A well-organized Zsh configuration. The main `~/.zshrc` is intended to be a syml
 
 ## API keys
 
-Low-sensitivity API keys (rotated often, usage-capped) live in a single store outside this repo, at `~/.local/share/agent-keys/keys.env`, mode `600`. `bin/keyfile` reads it; `zshrc.d/private.sh` loads the ambient groups into interactive shells.
+Low-sensitivity API keys (rotated often, usage-capped) live in a single store at `~/.config/keys.env`, mode `600` — gitignored, but inside this repo via the `home/.config/` symlink, so it is covered by the same backup as everything else here. `bin/keyfile` reads it; `zshrc.d/private.sh` loads the ambient groups into interactive shells.
 
 The store is a `.env` file divided into groups by `# [group]` headers:
 

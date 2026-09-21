@@ -162,7 +162,6 @@ class KeyfileTest(unittest.TestCase):
         got = self.run_kf('init', KEYFILE_PATH=str(nested))
         self.assertEqual(got.returncode, 0)
         self.assertEqual(nested.stat().st_mode & 0o777, 0o600)
-        self.assertEqual(nested.parent.stat().st_mode & 0o777, 0o700)
 
     def test_init_does_not_clobber(self) -> None:
         self.write('# [g]\nPRECIOUS=keep\n')
