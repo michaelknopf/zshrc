@@ -1,0 +1,354 @@
+#!/usr/bin/env python3
+"""linear-backlog — pull the Linear backlog locally and query it offline.
+
+Linear's MCP tools truncate descriptions to ~500 characters and cannot page a
+whole backlog within a token budget, so triage work that needs to read tickets
+has to come through the GraphQL API instead. This fetches everything once into a
+local JSON file, then answers questions against that file for free.
+
+Subcommands:
+  fetch                     pull open issues into the store (run this first)
+  index                     one line per ticket, filterable
+  show SAV-1 [SAV-2 ...]    full description(s)
+  grep PATTERN              search titles and descriptions
+  stats                     label, status and project counts
+  stale                     days since a human last touched each ticket
+
+Run it through keyfile so LINEAR_KEY reaches the process:
+
+    keyfile run linear -- linear-backlog fetch
+    linear-backlog index --nolabel --older 90
+
+`fetch` and `stale` are the only subcommands that need the key or the network.
+
+The store defaults to ~/.cache/linear-backlog/backlog.json; override with
+LINEAR_BACKLOG_STORE or --store.
+"""
+
+import argparse
+import datetime
+import json
+import os
+import pathlib
+import re
+import sys
+import typing
+import urllib.request
+
+ENDPOINT = 'https://api.linear.app/graphql'
+
+# Every state an issue can sit in while still being work someone might do.
+OPEN_STATES = ['backlog', 'unstarted', 'started', 'triage']
+
+_PRIORITY_NAMES = {0: 'No priority', 1: 'Urgent', 2: 'High', 3: 'Medium', 4: 'Low'}
+
+DEFAULT_STORE = pathlib.Path(
+    os.environ.get('LINEAR_BACKLOG_STORE')
+    or pathlib.Path.home() / '.cache' / 'linear-backlog' / 'backlog.json'
+)
+
+NOW = datetime.datetime.now(datetime.timezone.utc)
+
+
+def _die(msg: str) -> typing.NoReturn:
+    sys.exit(f'linear-backlog: {msg}')
+
+
+def _key() -> str:
+    key = os.environ.get('LINEAR_KEY') or os.environ.get('LINEAR_API_KEY')
+    if not key:
+        _die('LINEAR_KEY not set. Run via: keyfile run linear -- linear-backlog ...')
+    return key
+
+
+def _gql(query: str, variables: dict | None = None) -> dict:
+    body = json.dumps({'query': query, 'variables': variables or {}}).encode()
+    req = urllib.request.Request(ENDPOINT, data=body, headers={
+        'Content-Type': 'application/json',
+        'Authorization': _key(),  # Linear takes the raw key, with no Bearer prefix
+    })
+    with urllib.request.urlopen(req) as resp:
+        out = json.load(resp)
+    if 'errors' in out:
+        _die(f"GraphQL error: {json.dumps(out['errors'], indent=2)}")
+    return out['data']
+
+
+def _days(ts: str) -> int:
+    return (NOW - datetime.datetime.fromisoformat(ts.replace('Z', '+00:00'))).days
+
+
+# --------------------------------------------------------------------------- fetch
+
+_QUERY = '''query($filter: IssueFilter, $after: String) {
+  issues(filter: $filter, first: 250, after: $after) {
+    pageInfo { hasNextPage endCursor }
+    nodes {
+      identifier title description url createdAt updatedAt
+      priority
+      state { name type }
+      assignee { name }
+      project { name state }
+      labels { nodes { name parent { name } } }
+    }
+  }
+}'''
+
+
+def _flatten(node: dict) -> dict:
+    labels = node['labels']['nodes']
+    return {
+        'id': node['identifier'],
+        'title': node['title'],
+        'description': node.get('description') or '',
+        'url': node['url'],
+        'createdAt': node['createdAt'],
+        'updatedAt': node['updatedAt'],
+        # GraphQL returns a bare int where the MCP returns an object; the rest of
+        # this tool expects the object shape.
+        'priority': {'value': node.get('priority'),
+                     'name': _PRIORITY_NAMES.get(node.get('priority'), str(node.get('priority')))},
+        'status': node['state']['name'],
+        'statusType': node['state']['type'],
+        'assignee': (node.get('assignee') or {}).get('name'),
+        'project': (node.get('project') or {}).get('name'),
+        'projectState': (node.get('project') or {}).get('state'),
+        'labels': [f"{l['parent']['name']}/{l['name']}" if l.get('parent') else l['name']
+                   for l in labels],
+    }
+
+
+def cmd_fetch(args) -> None:
+    filt: dict = {}
+    if args.state == 'open':
+        filt['state'] = {'type': {'in': OPEN_STATES}}
+    elif args.state != 'all':
+        filt['state'] = {'type': {'eq': args.state}}
+
+    rows, after = [], None
+    while True:
+        page = _gql(_QUERY, {'filter': filt, 'after': after})['issues']
+        rows.extend(_flatten(n) for n in page['nodes'])
+        print(f'  fetched {len(rows)}...', file=sys.stderr)
+        if not page['pageInfo']['hasNextPage']:
+            break
+        after = page['pageInfo']['endCursor']
+
+    # A silent under-count is the failure mode worth guarding: print the split so
+    # a filter that quietly dropped a whole status is visible.
+    counts: dict[str, int] = {}
+    for r in rows:
+        counts[r['status']] = counts.get(r['status'], 0) + 1
+    for name, n in sorted(counts.items(), key=lambda kv: -kv[1]):
+        print(f'{n:>6}  {name}', file=sys.stderr)
+
+    args.store.parent.mkdir(parents=True, exist_ok=True)
+    args.store.write_text(json.dumps(rows, indent=1))
+    empty = sum(1 for r in rows if not r['description'].strip())
+    print(f'wrote {len(rows)} issues to {args.store} ({empty} with an empty description)',
+          file=sys.stderr)
+
+
+# --------------------------------------------------------------------------- queries
+
+def _load(store: pathlib.Path) -> list[dict]:
+    if not store.exists():
+        _die(f'no store at {store}. Run: keyfile run linear -- linear-backlog fetch')
+    return json.loads(store.read_text())
+
+
+def _prio(row: dict) -> str:
+    p = row.get('priority')
+    return p.get('name') if isinstance(p, dict) else _PRIORITY_NAMES.get(p, str(p))
+
+
+def _select(rows: list[dict], args) -> list[dict]:
+    out = rows
+    if args.project:
+        out = [r for r in out if (r.get('project') or 'NO PROJECT').lower() == args.project.lower()]
+    if args.label:
+        out = [r for r in out if any(args.label.lower() in l.lower() for l in r.get('labels') or [])]
+    if args.nolabel:
+        out = [r for r in out if not r.get('labels')]
+    if args.noarea:
+        out = [r for r in out if not any(l.startswith('Area/') for l in r.get('labels') or [])]
+    if args.nofeat:
+        out = [r for r in out if not any(l.startswith('Feat/') for l in r.get('labels') or [])]
+    if args.status:
+        out = [r for r in out if (r.get('status') or '').lower() == args.status.lower()]
+    if args.older:
+        out = [r for r in out if _days(r['createdAt']) >= args.older]
+    if args.newer:
+        out = [r for r in out if _days(r['createdAt']) <= args.newer]
+    return out
+
+
+def _line(r: dict) -> str:
+    desc = len((r.get('description') or '').strip())
+    # A glance at whether opening the ticket will tell you anything.
+    mark = '¶' if desc > 400 else ('·' if desc else ' ')
+    proj = (r.get('project') or 'NO PROJECT')[:22]
+    if r.get('projectState') in ('completed', 'canceled'):
+        proj = f"{proj[:16]}!{r['projectState'][:4]}"
+    labs = ','.join(r.get('labels') or []) or '-'
+    return (f"{r['id']:<9} {(r.get('status') or '')[:4]:<5} {_days(r['createdAt']):>4}d {mark} "
+            f"{proj:<23} {labs[:34]:<35} {r['title'][:52]}")
+
+
+def cmd_index(args) -> None:
+    rows = _select(_load(args.store), args)
+    for r in sorted(rows, key=lambda x: -_days(x['createdAt'])):
+        print(_line(r))
+    print(f'\n{len(rows)} tickets', file=sys.stderr)
+
+
+def cmd_show(args) -> None:
+    rows = {r['id']: r for r in _load(args.store)}
+    for key in args.ids:
+        r = rows.get(key.upper())
+        if not r:
+            print(f'{key}: not in store', file=sys.stderr)
+            continue
+        print(f"\n{'=' * 78}\n{r['id']}  [{r.get('status')}]  {_prio(r)}  "
+              f"{r.get('project') or 'NO PROJECT'}\n{r['title']}\n{'=' * 78}")
+        print(f"labels: {','.join(r.get('labels') or []) or '-'}   {r['url']}\n")
+        print(r.get('description') or '(no description)')
+
+
+def cmd_grep(args) -> None:
+    rx = re.compile(args.pattern, re.I)
+    rows = _select(_load(args.store), args)
+    hits = [r for r in rows if rx.search(r['title']) or rx.search(r.get('description') or '')]
+    for r in sorted(hits, key=lambda x: -_days(x['createdAt'])):
+        print(_line(r))
+    print(f'\n{len(hits)} matches', file=sys.stderr)
+
+
+def cmd_stats(args) -> None:
+    rows = _select(_load(args.store), args)
+    labels: dict[str, int] = {}
+    status: dict[str, int] = {}
+    project: dict[str, int] = {}
+    for r in rows:
+        for l in r.get('labels') or []:
+            labels[l] = labels.get(l, 0) + 1
+        if not r.get('labels'):
+            labels['(no labels)'] = labels.get('(no labels)', 0) + 1
+        status[r.get('status')] = status.get(r.get('status'), 0) + 1
+        key = r.get('project') or 'NO PROJECT'
+        project[key] = project.get(key, 0) + 1
+
+    print(f'{len(rows)} tickets')
+    for name, counter in (('status', status), ('labels', labels), ('projects', project)):
+        print(f'\n-- {name} --')
+        for k, v in sorted(counter.items(), key=lambda kv: -kv[1]):
+            print(f'{v:>4}  {k}')
+
+
+# --------------------------------------------------------------------------- stale
+
+_HISTORY = '''query($id: String!) {
+  issue(id: $id) {
+    identifier title createdAt
+    assignee { name }
+    state { name }
+    comments(first: 50) { nodes { createdAt user { name } } }
+    history(first: 50) { nodes {
+      createdAt actor { name }
+      fromStateId toStateId fromAssigneeId toAssigneeId
+      addedLabelIds removedLabelIds
+    } }
+  }
+}'''
+
+
+def cmd_stale(args) -> None:
+    """Days since a human last moved a ticket, ignoring label-only edits.
+
+    `updatedAt` cannot answer this: a bulk relabel touches every row and resets
+    it, erasing exactly the signal a grooming pass looks for. History entries
+    carry the actor and which fields changed, so label-only edits can be dropped.
+    """
+    rows = _select(_load(args.store), args)
+    out = []
+    for r in rows:
+        n = _gql(_HISTORY, {'id': r['id']})['issue']
+        events = []
+        for h in n['history']['nodes']:
+            label_only = (h.get('addedLabelIds') or h.get('removedLabelIds')) and not (
+                h.get('fromStateId') or h.get('toStateId')
+                or h.get('fromAssigneeId') or h.get('toAssigneeId'))
+            if label_only:
+                continue
+            if (h.get('actor') or {}).get('name'):
+                events.append((h['createdAt'], h['actor']['name']))
+        for c in n['comments']['nodes']:
+            events.append((c['createdAt'], (c.get('user') or {}).get('name', '?')))
+        events.sort(reverse=True)
+        last = events[0] if events else None
+        out.append({
+            'id': n['identifier'], 'title': n['title'],
+            'assignee': (n.get('assignee') or {}).get('name'),
+            'age': _days(n['createdAt']),
+            'idle': _days(last[0]) if last else _days(n['createdAt']),
+            'actor': last[1] if last else None,
+        })
+
+    print(f"{'ID':<9} {'age':>5} {'idle':>5} {'last human':<18} {'assignee':<14} title")
+    for r in sorted(out, key=lambda x: -x['idle']):
+        print(f"{r['id']:<9} {r['age']:>4}d {r['idle']:>4}d "
+              f"{(r['actor'] or '-')[:17]:<18} {(r['assignee'] or '-')[:13]:<14} {r['title'][:44]}")
+
+
+# --------------------------------------------------------------------------- cli
+
+def main() -> None:
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument('--store', type=pathlib.Path, default=DEFAULT_STORE,
+                    help=f'local JSON store (default: {DEFAULT_STORE})')
+    sub = ap.add_subparsers(dest='cmd', required=True)
+
+    def add_filters(p):
+        p.add_argument('--project')
+        p.add_argument('--label')
+        p.add_argument('--status')
+        p.add_argument('--nolabel', action='store_true', help='only tickets with no labels')
+        p.add_argument('--noarea', action='store_true', help='only tickets missing an Area/ label')
+        p.add_argument('--nofeat', action='store_true', help='only tickets missing a Feat/ label')
+        p.add_argument('--older', type=int, metavar='DAYS')
+        p.add_argument('--newer', type=int, metavar='DAYS')
+
+    p = sub.add_parser('fetch', help='pull issues from Linear into the store')
+    p.add_argument('--state', default='open',
+                   help='"open" (default: every open state), "all", or one type: '
+                        'backlog, unstarted, started, triage')
+    p.set_defaults(func=cmd_fetch)
+
+    p = sub.add_parser('index', help='one line per ticket')
+    add_filters(p)
+    p.set_defaults(func=cmd_index)
+
+    p = sub.add_parser('show', help='full description(s)')
+    p.add_argument('ids', nargs='+')
+    p.set_defaults(func=cmd_show)
+
+    p = sub.add_parser('grep', help='search titles and descriptions')
+    p.add_argument('pattern')
+    add_filters(p)
+    p.set_defaults(func=cmd_grep)
+
+    p = sub.add_parser('stats', help='label, status and project counts')
+    add_filters(p)
+    p.set_defaults(func=cmd_stats)
+
+    p = sub.add_parser('stale', help='days since a human last touched each ticket')
+    add_filters(p)
+    p.set_defaults(func=cmd_stale)
+
+    args = ap.parse_args()
+    args.func(args)
+
+
+if __name__ == '__main__':
+    main()
