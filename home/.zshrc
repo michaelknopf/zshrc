@@ -37,6 +37,7 @@ for _f in "${ZSHRC_SOURCE_FILES[@]}"; do
 done
 
 alias szsh="source ~/.zshrc"
+alias cdz='cd "$ZSHRC_ROOT"'
 
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /opt/homebrew/bin/terragrunt terragrunt
