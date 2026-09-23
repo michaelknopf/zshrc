@@ -9,10 +9,10 @@ set -euo pipefail
 # launchd starts this at login and restarts it if it dies, so the host is not
 # something to keep a terminal tab open for. Sessions it hosts die with it.
 
-# launchd gives us no login-shell environment, so PATH must be built here.
-# ~/.local/bin/claude is a symlink into a version-pinned directory that moves on
-# every update; resolving through PATH at exec time keeps this correct.
-export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+# launchd gives us no login-shell environment. Sessions spawn MCP servers by
+# bare name (mcp-grafana, npx), so they need the same PATH an interactive shell has.
+ZSHRC_ROOT="${0:A:h:h:h}"
+source "$ZSHRC_ROOT/zshrc.d/path.sh"
 
 # Sessions inherit this cwd. The apps can open other directories; this is only
 # where a session lands when it names none.
