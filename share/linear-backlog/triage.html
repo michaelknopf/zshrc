@@ -4,15 +4,15 @@
 /* Layout: ticket queue on the left, one ticket's full description and label controls on the right; stacks on phones. */
 :root {
   --bg: #f5f6f4; --surface: #ffffff; --fg: #1c2320; --muted: #5d6963; --line: #dce1dd;
-  --accent: #2f6b55; --accent-soft: #e2eee8; --changed: #9a5a12; --changed-soft: #f7ecda; --done: #2f6b55;
+  --accent: #2f6b55; --accent-soft: #e2eee8; --changed: #9a5a12; --changed-soft: #f7ecda; --done: #2f6b55; --hot: #c2412b;
   --body: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #131816; --surface: #1a201d; --fg: #e2e7e3; --muted: #98a49d; --line: #2b332f;
-  --accent: #7cc3a4; --accent-soft: #1e3028; --changed: #e3ad5c; --changed-soft: #382b17; --done: #7cc3a4; color-scheme: dark } }
+  --accent: #7cc3a4; --accent-soft: #1e3028; --changed: #e3ad5c; --changed-soft: #382b17; --done: #7cc3a4; --hot: #ef8a6f; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #131816; --surface: #1a201d; --fg: #e2e7e3; --muted: #98a49d; --line: #2b332f;
-  --accent: #7cc3a4; --accent-soft: #1e3028; --changed: #e3ad5c; --changed-soft: #382b17; --done: #7cc3a4; color-scheme: dark }
+  --accent: #7cc3a4; --accent-soft: #1e3028; --changed: #e3ad5c; --changed-soft: #382b17; --done: #7cc3a4; --hot: #ef8a6f; color-scheme: dark }
 html, body { height: 100%; }
 body { background: var(--bg); color: var(--fg); font: 14px/1.5 var(--body); }
 .app { display: grid; grid-template-columns: 300px 1fr; height: 100%; }
@@ -50,6 +50,9 @@ main { overflow-y: auto; min-width: 0; }
 .opts button.none[aria-pressed="true"] { color: var(--surface); }
 .opts button.was { box-shadow: inset 0 -2px 0 var(--changed); }
 .labels { display: grid; gap: 12px; }
+.opts button.hot[aria-pressed="true"] { background: var(--hot); border-color: var(--hot); color: var(--surface); }
+.opts .hint { font: 11px var(--mono); color: var(--muted); align-self: center; }
+.wk { font: 600 10px/1 var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--hot); margin-right: 6px; }
 .labels.off { opacity: .35; pointer-events: none; }
 .dup { font: 12.5px var(--mono); width: 110px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); }
 .note { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
@@ -95,6 +98,7 @@ button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
         <button type="button" data-f="todo" aria-pressed="false">To review</button>
         <button type="button" data-f="chg" aria-pressed="false">Has changes</button>
         <button type="button" data-f="done" aria-pressed="false">Reviewed</button>
+        <button type="button" data-f="week" aria-pressed="false">This week</button>
       </div>
       <div class="save" id="save">Connecting…</div>
     </div>
@@ -146,19 +150,21 @@ function renderQueue() {
     if (filter === 'todo') return !s.reviewed;
     if (filter === 'done') return !!s.reviewed;
     if (filter === 'chg') return changes(t.id).length > 0;
+    if (filter === 'week') return !!s.thisWeek;
     return true;
   });
   q.replaceChildren(...items.map(t => {
     const ch = changes(t.id);
     const b = el('button', {type: 'button', class: 'qi' + ((STATE[t.id] || {}).reviewed ? ' done' : ''), 'aria-current': String(t.id === currentId)},
-      el('span', {class: 'dot'}), el('span', {class: 't', text: t.title}),
+      el('span', {class: 'dot'}), el('span', {class: 't'}, (STATE[t.id] || {}).thisWeek ? el('span', {class: 'wk', text: 'This week'}) : null, t.title),
       el('span', {class: 's'}, `${t.id} · ${t.age}d `, ch.length ? el('span', {class: 'chg', text: `· ${ch.length} change${ch.length > 1 ? 's' : ''}`}) : '· no change'));
     b.addEventListener('click', () => { currentId = t.id; renderAll(); document.getElementById('main').scrollTop = 0; });
     return b;
   }));
   const done = D.tickets.filter(t => (STATE[t.id] || {}).reviewed).length;
   const nchg = D.tickets.filter(t => changes(t.id).length).length;
-  document.getElementById('progress').textContent = `${done} of ${D.tickets.length} reviewed · ${nchg} with label changes`;
+  const nweek = D.tickets.filter(t => (STATE[t.id] || {}).thisWeek).length;
+  document.getElementById('progress').textContent = `${done} of ${D.tickets.length} reviewed · ${nchg} with changes · ${nweek} this week`;
   document.getElementById('barfill').style.width = (100 * done / D.tickets.length) + '%';
 }
 
@@ -185,6 +191,18 @@ function tagGroup(id) {
     b.addEventListener('click', () => update(id, {tags: on ? c.tags.filter(x => x !== v) : [...c.tags, v]}));
     box.append(b);
   }
+  return box;
+}
+
+function weekGroup(id) {
+  const on = !!(STATE[id] || {}).thisWeek;
+  const box = el('div', {class: 'opts'});
+  for (const [v, label] of [[true, 'Yes, maybe this week'], [false, 'No']]) {
+    const b = el('button', {type: 'button', class: v ? 'hot' : '', 'aria-pressed': String(on === v), text: label});
+    b.addEventListener('click', () => update(id, {thisWeek: v}));
+    box.append(b);
+  }
+  box.append(el('span', {class: 'hint', text: 'Kept on this page only; never written to Linear'}));
   return box;
 }
 
@@ -234,6 +252,7 @@ function renderMain() {
     el('div', {class: 'lrow'}, el('span', {text: 'Source'}), optGroup(currentId, 'source', D.sources, true)),
     el('div', {class: 'lrow'}, el('span', {text: 'Type'}), tagGroup(currentId)));
   const panel = el('div', {class: 'panel'},
+    el('div', {class: 'lrow'}, el('span', {text: 'Week'}), weekGroup(currentId)),
     el('div', {class: 'lrow'}, el('span', {text: 'Status'}), statusGroup(currentId)),
     labelRows,
     el('div', {class: 'note'}, el('div', {}, el('b', {text: 'Claude: '}), t.note || 'No proposal yet. Showing the current labels.'),
