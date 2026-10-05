@@ -1,0 +1,263 @@
+#!/usr/bin/env -S uv run --quiet --script
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pyobjc-framework-ApplicationServices"]
+# ///
+"""claude-account-teleport — move open Claude Desktop Code sessions from one account to another.
+
+Guide: "Moving Sessions Between Accounts" in Engineering Docs (Notion).
+
+Subcommands:
+  list                     Account scopes on this Mac and their open sessions.
+  copy-records FROM TO     Copy FROM's open session records into TO. App must be quit.
+  restore-groups FROM TO   Recreate FROM's sidebar groups for TO's copies. App must be running on TO.
+  enable-rc SCOPE          Turn on Remote Control for SCOPE's open sessions. App must be running on SCOPE.
+
+A scope is `<account-id>/<org-id>` under claude-code-sessions/; any unique prefix of it works. Records are plain files, but groups and per-session Remote Control are
+not: the app reverts file edits to groups and ignores the record's Remote Control flag. Those
+two subcommands therefore drive the app's own UI through macOS accessibility, which needs
+Accessibility permission for the terminal running this.
+"""
+import argparse
+import glob
+import json
+import os
+import subprocess
+import sys
+import time
+import uuid
+from dataclasses import dataclass
+
+APP_DIR = os.path.expanduser('~/Library/Application Support/Claude')
+SESSIONS_DIR = f'{APP_DIR}/claude-code-sessions'
+CONFIG = f'{APP_DIR}/claude_desktop_config.json'
+
+# Fields bound to the old account's server state or connectors.
+DROP_FIELDS = [
+    'bridgeSessionIds', 'enabledMcpTools', 'remoteMcpServersConfig', 'prs', 'seenCommentIds',
+    'peerReceipts', 'spawnSeed', 'promptAppendSnapshot', 'toolSurfaceSnapshot',
+    'subagentsTruncatedFor', 'steeredByRemoteClient', 'resolvedBackgroundTaskSuggestions',
+    'lastAssistantUuid',
+]
+
+
+@dataclass
+class Session:
+    record_id: str
+    cli_session_id: str
+    title: str
+    cwd: str
+    path: str
+
+
+class Scope:
+    def __init__(self, name: str):
+        self.name = name
+        self.dir = f'{SESSIONS_DIR}/{name}'
+
+    @classmethod
+    def all(cls) -> list['Scope']:
+        dirs = glob.glob(f'{SESSIONS_DIR}/*/*/')
+        return sorted((cls(os.path.relpath(d, SESSIONS_DIR)) for d in dirs), key=lambda s: -os.path.getmtime(s.dir))
+
+    @classmethod
+    def resolve(cls, prefix: str) -> 'Scope':
+        matches = [s for s in cls.all() if s.name.startswith(prefix)]
+        if len(matches) > 1:  # an account has a folder per org it has seen; prefer the one in use
+            matches = [s for s in matches if glob.glob(f'{s.dir}/local_*.json')]
+        if len(matches) != 1:
+            sys.exit(f'scope prefix {prefix!r} matches {len(matches)} scopes; run `list`')
+        return matches[0]
+
+    def open_sessions(self) -> list[Session]:
+        out = []
+        for f in glob.glob(f'{self.dir}/local_*.json'):
+            d = json.load(open(f))
+            if not d.get('isArchived'):
+                out.append(Session(d['sessionId'], d['cliSessionId'], d.get('title') or '', d.get('cwd', ''), f))
+        return out
+
+    def groups(self) -> dict:
+        prefs = json.load(open(CONFIG)).get('preferences', {}).get('epitaxyPrefs', {})
+        return prefs.get('dframe-group-scopes', {}).get(self.name, {'groups': [], 'assignments': {}, 'order': {}})
+
+
+def app_running() -> bool:
+    return subprocess.run(['pgrep', '-f', 'Claude.app/Contents/MacOS/Claude$'], capture_output=True).returncode == 0
+
+
+class ClaudeUI:
+    """The desktop app's sidebar and session header, driven through the accessibility tree."""
+
+    def __init__(self):
+        from ApplicationServices import AXUIElementCreateApplication, AXUIElementSetAttributeValue
+        pid = int(subprocess.check_output(['pgrep', '-f', 'Claude.app/Contents/MacOS/Claude$']).split()[0])
+        self.app = AXUIElementCreateApplication(pid)
+        AXUIElementSetAttributeValue(self.app, 'AXManualAccessibility', True)
+
+    @staticmethod
+    def attr(e, name):
+        from ApplicationServices import AXUIElementCopyAttributeValue
+        err, v = AXUIElementCopyAttributeValue(e, name, None)
+        return v if err == 0 else None
+
+    def label(self, e) -> str:
+        return ' | '.join(str(x) for x in (self.attr(e, 'AXTitle'), self.attr(e, 'AXDescription'), self.attr(e, 'AXValue')) if x not in (None, ''))
+
+    def find_all(self, pred, root=None, depth=0, out=None) -> list:
+        out = [] if out is None else out
+        root = root if root is not None else self.app
+        if depth > 70:
+            return out
+        if pred(root):
+            out.append(root)
+        for c in self.attr(root, 'AXChildren') or []:
+            self.find_all(pred, c, depth + 1, out)
+        return out
+
+    def find(self, role: str, label: str, root=None):
+        found = self.find_all(lambda e: self.attr(e, 'AXRole') == role and self.label(e) == label, root)
+        return found[0] if found else None
+
+    def press(self, e):
+        from ApplicationServices import AXUIElementPerformAction
+        AXUIElementPerformAction(e, 'AXPress')
+
+    def keys(self, *commands: str):
+        script = ['-e', 'tell application "Claude" to activate', '-e', 'delay 0.2']
+        for c in commands:
+            script += ['-e', f'tell application "System Events" to {c}', '-e', 'delay 0.2']
+        subprocess.run(['osascript', *script], check=True)
+
+    def web(self):
+        areas = self.find_all(lambda e: self.attr(e, 'AXRole') == 'AXWebArea')
+        return next(a for a in areas if self.find_all(lambda e: self.label(e) == 'Sidebar', a))
+
+    def options_button(self, title: str):
+        return self.find('AXPopUpButton', f'More options for {title}')
+
+    def open_session(self, title: str) -> bool:
+        pop = self.options_button(title)
+        if pop is None:
+            return False
+        row = self.attr(self.attr(pop, 'AXParent'), 'AXParent')
+        button = next(c for c in self.attr(row, 'AXChildren') if self.attr(c, 'AXRole') == 'AXButton')
+        self.press(button)
+        time.sleep(4)
+        return True
+
+    def group_menu(self, title: str):
+        from ApplicationServices import AXUIElementSetAttributeValue
+        self.press(self.options_button(title))
+        time.sleep(0.7)
+        AXUIElementSetAttributeValue(self.find('AXMenuItem', 'Move to group'), 'AXFocused', True)
+        self.keys('key code 124')  # the submenu only opens from the keyboard, not AXPress
+        time.sleep(0.7)
+        return self.find_all(lambda e: self.attr(e, 'AXRole') == 'AXMenu' and self.label(e) == 'Move to group', self.web())[-1]
+
+    def move_to_group(self, title: str, group: str, create: bool):
+        menu = self.group_menu(title)
+        if create:
+            self.press(self.find_all(lambda e: self.label(e) == 'New group…', menu)[0])
+            time.sleep(0.8)
+            self.keys(f'keystroke "{group}"')
+            self.press(self.find('AXButton', 'Create group'))
+        else:
+            item = self.find_all(lambda e: self.attr(e, 'AXRole') == 'AXMenuItem' and self.label(e).split(' | ')[0] == group, menu)[0]
+            self.press(item)
+        time.sleep(1)
+
+    def remote_control_state(self) -> str:
+        web = self.web()
+        on = self.find_all(lambda e: self.attr(e, 'AXRole') == 'AXCheckBox' and self.label(e).startswith('Remote Control'), web)
+        if on:
+            return 'on' if self.attr(on[0], 'AXValue') == 1 else 'off'
+        return 'off' if self.find('AXPopUpButton', 'Remote Control', web) else 'unavailable'
+
+    def enable_remote_control(self):
+        self.press(self.find('AXPopUpButton', 'Remote Control', self.web()))
+        time.sleep(0.8)
+        item = self.find_all(lambda e: self.attr(e, 'AXRole') == 'AXMenuItem' and self.label(e).startswith('Remote Control'), self.web())[0]
+        self.press(item)
+        time.sleep(2)
+        self.keys('key code 53')
+
+
+def cmd_list(_args):
+    for scope in Scope.all():
+        sessions = scope.open_sessions()
+        print(f'{scope.name}  ({len(sessions)} open)')
+        for s in sorted(sessions, key=lambda s: s.title):
+            print(f'  {s.cli_session_id}  {s.title}  [{s.cwd}]')
+
+
+def cmd_copy_records(args):
+    if app_running():
+        sys.exit('quit the Claude app first (⌘Q)')
+    src, dst = Scope.resolve(args.src), Scope.resolve(args.dst)
+    present = {s.cli_session_id for s in dst.open_sessions()}
+    for s in src.open_sessions():
+        if s.cli_session_id in present:
+            continue
+        d = json.load(open(s.path))
+        for k in DROP_FIELDS:
+            d.pop(k, None)
+        d['sessionId'] = f'local_{uuid.uuid4()}'
+        json.dump(d, open(f"{dst.dir}/{d['sessionId']}.json", 'w'), indent=2)
+        print(f'copied  {s.title}')
+
+
+def cmd_restore_groups(args):
+    if not app_running():
+        sys.exit('open the Claude app, logged in to the new account')
+    src, dst = Scope.resolve(args.src), Scope.resolve(args.dst)
+    by_cli = {s.cli_session_id: s for s in dst.open_sessions()}
+    src_titles = {f'code:{s.record_id}': by_cli.get(s.cli_session_id) for s in src.open_sessions()}
+    old, ui = src.groups(), ClaudeUI()
+    for group in old['groups']:
+        members = [src_titles[k] for k in old['order'].get(group['id'], []) if src_titles.get(k)]
+        for s in members:
+            new = dst.groups()
+            new_ids = {g['name']: g['id'] for g in new['groups']}
+            if new['assignments'].get(f'code:{s.record_id}') == new_ids.get(group['name']):
+                continue
+            ui.move_to_group(s.title, group['name'], create=group['name'] not in new_ids)
+            print(f"{group['name']:20} {s.title}")
+
+
+def cmd_enable_rc(args):
+    if not app_running():
+        sys.exit('open the Claude app first')
+    ui = ClaudeUI()
+    titles = sorted({s.title for s in Scope.resolve(args.scope).open_sessions()})
+    for title in titles:
+        if not ui.open_session(title):
+            print(f'{"not in sidebar":12} {title}')
+            continue
+        state = ui.remote_control_state()
+        if state == 'off':
+            ui.enable_remote_control()
+            state = ui.remote_control_state()
+        print(f'{state:12} {title}')
+    print("\n'off' after a toggle means the session's process isn't running yet: send it a message and rerun."
+          "\n'unavailable' means the session has no folder (e.g. a deleted scratch workspace).")
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    sub = p.add_subparsers(dest='cmd', required=True)
+    sub.add_parser('list').set_defaults(fn=cmd_list)
+    for name, fn in (('copy-records', cmd_copy_records), ('restore-groups', cmd_restore_groups)):
+        sp = sub.add_parser(name)
+        sp.add_argument('src', metavar='FROM')
+        sp.add_argument('dst', metavar='TO')
+        sp.set_defaults(fn=fn)
+    sp = sub.add_parser('enable-rc')
+    sp.add_argument('scope', metavar='SCOPE')
+    sp.set_defaults(fn=cmd_enable_rc)
+    args = p.parse_args()
+    args.fn(args)
+
+
+if __name__ == '__main__':
+    main()
