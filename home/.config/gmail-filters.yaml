@@ -29,6 +29,7 @@ accounts:
           from: testflight_no_reply@email.apple.com
         labels:
           - Apple/TestFlight
+        archive: true
       - criteria:
           query: list:(<aws.savisecurity.com>)
           subject: Upcoming routine retirement of your AWS Elastic Container Service tasks running on AWS Fargate
@@ -81,11 +82,13 @@ accounts:
           subject: Trending stability issues
         labels:
           - Firebase/Stability
+        archive: true
       - criteria:
           from: firebase-noreply@google.com
           subject: Missing dSYM
         labels:
           - Firebase/Missing dSYM
+        archive: true
       - criteria:
           from: cloudplatform-noreply@google.com
           subject: '[Action Advised]'
@@ -264,6 +267,32 @@ accounts:
           query: '"linear[bot] left a comment"'
         labels: []
         archive: true
+      # Activity on PRs I authored (CI, bots, pushes). Mentions and review requests stay in the inbox.
+      - criteria:
+          from: notifications@github.com
+          query: cc:author@noreply.github.com -cc:mention@noreply.github.com -cc:review_requested@noreply.github.com -cc:team_mention@noreply.github.com
+        labels:
+          - GitHub
+        archive: true
+      - criteria:
+          from: notifications@savi-security.intercom-mail.com
+          subject: '"closed a"'
+        labels:
+          - Intercom
+        archive: true
+      # Ramp's replies confirming it matched a receipt. Its actionable mail has no "Re:".
+      - criteria:
+          from: communications@ramp.com
+          subject: 'Re:'
+        labels:
+          - Ramp
+        archive: true
+      - criteria:
+          from: alerts@notifications.firecrawl.dev
+          subject: Auto-reload added credits
+        labels:
+          - quota alerts
+        archive: true
       - criteria:
           from: codecov[bot]
         labels: []
@@ -339,11 +368,13 @@ accounts:
           subject: 'Notice: surcharges'
         labels:
           - Telnyx/Notices
+        archive: true
       - criteria:
           from: portal@telnyx.com
           subject: Rate Update
         labels:
           - Telnyx/Notices
+        archive: true
       - criteria:
           from: portal@telnyx.com
           subject: New Comment on Advanced Order
@@ -532,6 +563,7 @@ accounts:
           subject: $set and $set_once
         labels:
           - PostHog/Deprecations
+        archive: true
       - criteria:
           from: alerts@notifications.firecrawl.dev
           subject: of your Firecrawl credits
@@ -742,6 +774,24 @@ accounts:
           subject: 'Savi Security:'
         labels:
           - Google/Play Console
+      - criteria:
+          query: list:(<gcp-tf.savisec.github.com>)
+        labels:
+          - GitHub/gcp-tf
+      - criteria:
+          query: from:mail.anthropic.com
+          subject: Security alert
+        labels:
+          - Anthropic/Security
+      - criteria:
+          query: from:mail.anthropic.com
+          subject: link to
+        labels:
+          - Anthropic/Login Links
+      - criteria:
+          from: security@updates.linear.app
+        labels:
+          - Linear/Security
     sweep:
       label: Delayed Archive
       days: 7
@@ -790,3 +840,12 @@ accounts:
 
         - label:"Savi/auth"
         - label:"Town/marketing"
+        - label:"GitHub/gcp-tf"
+        - label:"Anthropic/Security"
+        - label:"Anthropic/Login Links"
+        - label:"Linear/Security"
+        - label:"GCP/Action Advised"
+        - from:CloudPlatform-noreply@google.com
+        - from:no-reply@sns.amazonaws.com subject:savi-ci
+        - from:admin@savisecurity.com subject:"[GitHub]"
+        - from:hello@savisecurity.com subject:"wrong number"
