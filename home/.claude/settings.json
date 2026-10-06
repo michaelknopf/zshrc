@@ -105,5 +105,6 @@
     "Search",
     "Read",
     "WebSearch"
-  ]
+  ],
+  "outputStyle": "Concise"
 }
