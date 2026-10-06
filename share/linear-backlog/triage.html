@@ -1,0 +1,302 @@
+<title>Hot Ticket Labeling</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: ticket queue on the left, one ticket's full description and label controls on the right; stacks on phones. */
+:root {
+  --bg: #f5f6f4; --surface: #ffffff; --fg: #1c2320; --muted: #5d6963; --line: #dce1dd;
+  --accent: #2f6b55; --accent-soft: #e2eee8; --changed: #9a5a12; --changed-soft: #f7ecda; --done: #2f6b55; --hot: #c2412b;
+  --body: "IBM Plex Sans", system-ui, sans-serif; --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #131816; --surface: #1a201d; --fg: #e2e7e3; --muted: #98a49d; --line: #2b332f;
+  --accent: #7cc3a4; --accent-soft: #1e3028; --changed: #e3ad5c; --changed-soft: #382b17; --done: #7cc3a4; --hot: #ef8a6f; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #131816; --surface: #1a201d; --fg: #e2e7e3; --muted: #98a49d; --line: #2b332f;
+  --accent: #7cc3a4; --accent-soft: #1e3028; --changed: #e3ad5c; --changed-soft: #382b17; --done: #7cc3a4; --hot: #ef8a6f; color-scheme: dark }
+html, body { height: 100%; }
+body { background: var(--bg); color: var(--fg); font: 14px/1.5 var(--body); }
+.app { display: grid; grid-template-columns: 300px 1fr; height: 100%; }
+aside { border-right: 1px solid var(--line); display: flex; flex-direction: column; min-height: 0; background: var(--surface); }
+.head { padding: 16px; border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
+.head h1 { font-size: 16px; margin: 0; font-weight: 600; }
+.progress { font: 12px var(--mono); color: var(--muted); }
+.bar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); width: 0; }
+.filters { display: flex; gap: 4px; flex-wrap: wrap; }
+.filters button { font: 500 11.5px var(--body); padding: 3px 8px; border: 1px solid var(--line); border-radius: 12px; background: transparent; color: var(--muted); cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--fg); color: var(--surface); border-color: var(--fg); }
+.queue { overflow-y: auto; flex: 1; }
+.qi { display: grid; grid-template-columns: 16px 1fr; gap: 2px 8px; padding: 9px 16px; border-bottom: 1px solid var(--line); cursor: pointer; background: none; border-left: 0; border-right: 0; border-top: 0; text-align: left; width: 100%; color: inherit; font: inherit; }
+.qi:hover { background: var(--bg); }
+.qi[aria-current="true"] { background: var(--accent-soft); }
+.qi .dot { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--muted); margin-top: 5px; }
+.qi.done .dot { background: var(--done); border-color: var(--done); }
+.qi .t { font-weight: 500; font-size: 13px; line-height: 1.35; }
+.qi .s { grid-column: 2; font: 11px var(--mono); color: var(--muted); }
+.qi .s .chg { color: var(--changed); }
+main { overflow-y: auto; min-width: 0; }
+.ticket { max-width: 860px; margin: 0 auto; padding-inline: 24px; padding-block: 20px 60px; display: grid; gap: 18px; }
+.tmeta { font: 12px var(--mono); color: var(--muted); display: flex; gap: 12px; flex-wrap: wrap; }
+.tmeta a { color: var(--accent); }
+.ticket h2 { margin: 0; font-size: 22px; line-height: 1.25; text-wrap: balance; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 12px; position: sticky; top: 0; z-index: 1; }
+.lrow { display: grid; grid-template-columns: 64px 1fr; gap: 10px; align-items: center; }
+.lrow > span { font: 500 11px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.opts { display: flex; flex-wrap: wrap; gap: 5px; }
+.opts button { font: 500 12.5px var(--body); padding: 4px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); cursor: pointer; }
+.opts button:hover { border-color: var(--accent); }
+.opts button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--surface); }
+.opts button.none { color: var(--muted); font-style: italic; }
+.opts button.none[aria-pressed="true"] { color: var(--surface); }
+.opts button.was { box-shadow: inset 0 -2px 0 var(--changed); }
+.labels { display: grid; gap: 12px; }
+.opts button.hot[aria-pressed="true"] { background: var(--hot); border-color: var(--hot); color: var(--surface); }
+.opts .hint { font: 11px var(--mono); color: var(--muted); align-self: center; }
+.wk { font: 600 10px/1 var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--hot); margin-right: 6px; }
+.labels.off { opacity: .35; pointer-events: none; }
+.dup { font: 12.5px var(--mono); width: 110px; padding: 4px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--bg); color: var(--fg); }
+.note { font-size: 13px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; display: grid; gap: 4px; }
+.note b { color: var(--fg); font-weight: 500; }
+.diff { font: 12px var(--mono); color: var(--changed); }
+.actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.actions button { font: 600 13px var(--body); padding: 7px 14px; border-radius: 7px; border: 1px solid var(--accent); background: var(--accent); color: var(--surface); cursor: pointer; }
+.actions button.ghost { background: transparent; color: var(--fg); border-color: var(--line); font-weight: 500; }
+.actions .hint { font: 11.5px var(--mono); color: var(--muted); }
+.desc { line-height: 1.6; min-width: 0; overflow-wrap: anywhere; }
+.desc h1, .desc h2, .desc h3 { font-size: 15px; margin: 18px 0 6px; }
+.desc p { margin: 0 0 10px; }
+.desc ul, .desc ol { padding-left: 20px; margin: 0 0 10px; }
+.desc code { font: 12.5px var(--mono); background: var(--bg); border: 1px solid var(--line); padding: 0 4px; border-radius: 4px; }
+.desc pre { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; overflow-x: auto; }
+.desc pre code { border: 0; padding: 0; background: none; }
+.desc table { border-collapse: collapse; font-size: 13px; display: block; overflow-x: auto; }
+.desc th, .desc td { border: 1px solid var(--line); padding: 4px 8px; text-align: left; }
+.desc a { color: var(--accent); }
+.desc blockquote { margin: 0 0 10px; padding-left: 12px; border-left: 3px solid var(--line); color: var(--muted); }
+.empty { color: var(--muted); font-style: italic; }
+.save { font: 11.5px var(--mono); color: var(--muted); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; height: auto; }
+  aside { border-right: 0; border-bottom: 1px solid var(--line); }
+  .queue { max-height: 240px; }
+  .ticket { padding-inline: 16px; }
+  .panel { position: static; }
+  .lrow { grid-template-columns: 1fr; gap: 4px; }
+}
+</style>
+
+<div class="app">
+  <aside>
+    <div class="head">
+      <h1>Hot ticket labeling</h1>
+      <div class="progress" id="built"></div>
+      <div class="progress" id="progress"></div>
+      <div class="bar"><i id="barfill"></i></div>
+      <div class="filters" id="filters">
+        <button type="button" data-f="all" aria-pressed="true">All</button>
+        <button type="button" data-f="todo" aria-pressed="false">To review</button>
+        <button type="button" data-f="chg" aria-pressed="false">Has changes</button>
+        <button type="button" data-f="done" aria-pressed="false">Reviewed</button>
+        <button type="button" data-f="week" aria-pressed="false">This week</button>
+      </div>
+      <div class="save" id="save">Connecting…</div>
+    </div>
+    <div class="queue" id="queue"></div>
+  </aside>
+  <main id="main"></main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
+<script id="data" type="application/json">__DATA__</script>
+<script>
+const D = JSON.parse(document.getElementById('data').textContent);
+const byId = Object.fromEntries(D.tickets.map(t => [t.id, t]));
+let STATE = {};   // id -> {area, feat, source, tags, reviewed}
+let db = null, filter = 'all', currentId = D.tickets[0].id;
+const LS = 'hot-labels-v1';
+try { STATE = JSON.parse(localStorage.getItem(LS) || '{}'); } catch (e) {}
+
+const el = (tag, attrs = {}, ...kids) => {
+  const n = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (k === 'class') n.className = v; else if (k === 'text') n.textContent = v; else n.setAttribute(k, v);
+  }
+  for (const k of kids) if (k != null) n.append(k);
+  return n;
+};
+const STATUSES = [['', 'Leave open'], ['done', 'Done'], ['canceled', 'Canceled'], ['duplicate', 'Duplicate']];
+const chosen = id => Object.assign({status: '', duplicateOf: ''}, byId[id].prop, STATE[id] || {});
+const closing = id => !!chosen(id).status;
+const changes = id => {
+  const t = byId[id], c = chosen(id), out = [];
+  if (c.status === 'duplicate') return [`close as duplicate of ${c.duplicateOf || '?'}`];
+  if (c.status) return [`mark ${c.status}`];
+  for (const g of ['area', 'feat', 'source']) {
+    const was = t.cur[g] || '', now = c[g] || '';
+    if (was !== now) out.push(`${g} ${was || '∅'} → ${now || '∅'}`);
+  }
+  const add = c.tags.filter(x => !t.cur.tags.includes(x)), rm = t.cur.tags.filter(x => !c.tags.includes(x));
+  if (add.length) out.push('+' + add.join(' +'));
+  if (rm.length) out.push('−' + rm.join(' −'));
+  return out;
+};
+
+function renderQueue() {
+  const q = document.getElementById('queue');
+  const items = D.tickets.filter(t => {
+    const s = STATE[t.id] || {};
+    if (filter === 'todo') return !s.reviewed;
+    if (filter === 'done') return !!s.reviewed;
+    if (filter === 'chg') return changes(t.id).length > 0;
+    if (filter === 'week') return !!s.thisWeek;
+    return true;
+  });
+  q.replaceChildren(...items.map(t => {
+    const ch = changes(t.id);
+    const b = el('button', {type: 'button', class: 'qi' + ((STATE[t.id] || {}).reviewed ? ' done' : ''), 'aria-current': String(t.id === currentId)},
+      el('span', {class: 'dot'}), el('span', {class: 't'}, (STATE[t.id] || {}).thisWeek ? el('span', {class: 'wk', text: 'This week'}) : null, t.title),
+      el('span', {class: 's'}, `${t.id} · ${t.age}d `, ch.length ? el('span', {class: 'chg', text: `· ${ch.length} change${ch.length > 1 ? 's' : ''}`}) : '· no change'));
+    b.addEventListener('click', () => { currentId = t.id; renderAll(); document.getElementById('main').scrollTop = 0; });
+    return b;
+  }));
+  const done = D.tickets.filter(t => (STATE[t.id] || {}).reviewed).length;
+  const nchg = D.tickets.filter(t => changes(t.id).length).length;
+  const nweek = D.tickets.filter(t => (STATE[t.id] || {}).thisWeek).length;
+  document.getElementById('progress').textContent = `${done} of ${D.tickets.length} reviewed · ${nchg} with changes · ${nweek} this week`;
+  document.getElementById('barfill').style.width = (100 * done / D.tickets.length) + '%';
+}
+
+function optGroup(id, group, values, allowNone) {
+  const c = chosen(id), t = byId[id];
+  const box = el('div', {class: 'opts'});
+  const mk = (v, label) => {
+    const b = el('button', {type: 'button', class: (v === '' ? 'none' : '') + ((t.cur[group] || '') === v ? ' was' : ''), 'aria-pressed': String((c[group] || '') === v), text: label});
+    b.title = (t.cur[group] || '') === v ? 'Current value in Linear' : '';
+    b.addEventListener('click', () => update(id, {[group]: v}));
+    return b;
+  };
+  for (const v of values) box.append(mk(v, v));
+  if (allowNone) box.append(mk('', 'none'));
+  return box;
+}
+
+function tagGroup(id) {
+  const c = chosen(id), t = byId[id];
+  const box = el('div', {class: 'opts'});
+  for (const v of D.tags) {
+    const on = c.tags.includes(v);
+    const b = el('button', {type: 'button', class: t.cur.tags.includes(v) ? 'was' : '', 'aria-pressed': String(on), text: v});
+    b.addEventListener('click', () => update(id, {tags: on ? c.tags.filter(x => x !== v) : [...c.tags, v]}));
+    box.append(b);
+  }
+  return box;
+}
+
+function weekGroup(id) {
+  const on = !!(STATE[id] || {}).thisWeek;
+  const box = el('div', {class: 'opts'});
+  for (const [v, label] of [[true, 'Yes, maybe this week'], [false, 'No']]) {
+    const b = el('button', {type: 'button', class: v ? 'hot' : '', 'aria-pressed': String(on === v), text: label});
+    b.addEventListener('click', () => update(id, {thisWeek: v}));
+    box.append(b);
+  }
+  box.append(el('span', {class: 'hint', text: 'Kept on this page only; never written to Linear'}));
+  return box;
+}
+
+function statusGroup(id) {
+  const c = chosen(id);
+  const box = el('div', {class: 'opts'});
+  for (const [v, label] of STATUSES) {
+    const b = el('button', {type: 'button', class: v === '' ? 'was' : '', 'aria-pressed': String(c.status === v), text: label});
+    b.addEventListener('click', () => update(id, {status: v}));
+    box.append(b);
+  }
+  if (c.status === 'duplicate') {
+    const inp = el('input', {type: 'text', id: 'dup-' + id, class: 'dup', placeholder: 'SAV-123', 'aria-label': 'Duplicate of'});
+    inp.value = c.duplicateOf || '';
+    inp.addEventListener('change', () => update(id, {duplicateOf: inp.value.trim().toUpperCase()}));
+    box.append(inp);
+  }
+  return box;
+}
+
+function renderDesc(md) {
+  if (!md.trim()) return el('p', {class: 'empty', text: 'No description.'});
+  const box = el('div', {class: 'desc'});
+  let html;
+  try { html = DOMPurify.sanitize(marked.parse(md.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '[image: $1]($2)'))); }
+  catch (e) { box.append(el('pre', {text: md})); return box; }
+  box.innerHTML = html;
+  box.querySelectorAll('a').forEach(a => { a.target = '_blank'; a.rel = 'noopener'; });
+  return box;
+}
+
+function renderMain() {
+  const t = byId[currentId], s = STATE[currentId] || {};
+  const ch = changes(currentId);
+  const idx = D.tickets.findIndex(x => x.id === currentId);
+  const next = () => { const n = D.tickets.slice(idx + 1).concat(D.tickets.slice(0, idx)).find(x => !(STATE[x.id] || {}).reviewed); if (n) { currentId = n.id; renderAll(); document.getElementById('main').scrollTop = 0; } };
+  const accept = el('button', {type: 'button', text: s.reviewed ? 'Reviewed ✓ — next' : 'Looks good — next'});
+  accept.addEventListener('click', async () => { await update(currentId, {reviewed: true}); next(); });
+  const undo = s.reviewed ? el('button', {type: 'button', class: 'ghost', text: 'Mark unreviewed'}) : null;
+  if (undo) undo.addEventListener('click', () => update(currentId, {reviewed: false}));
+  const reset = el('button', {type: 'button', class: 'ghost', text: 'Reset to proposal'});
+  reset.addEventListener('click', () => update(currentId, {area: t.prop.area, feat: t.prop.feat, source: t.prop.source, tags: t.prop.tags, status: '', duplicateOf: ''}));
+
+  const labelRows = el('div', {class: 'labels' + (closing(currentId) ? ' off' : '')},
+    el('div', {class: 'lrow'}, el('span', {text: 'Area'}), optGroup(currentId, 'area', D.areas, false)),
+    el('div', {class: 'lrow'}, el('span', {text: 'Feat'}), optGroup(currentId, 'feat', D.feats, true)),
+    el('div', {class: 'lrow'}, el('span', {text: 'Source'}), optGroup(currentId, 'source', D.sources, true)),
+    el('div', {class: 'lrow'}, el('span', {text: 'Type'}), tagGroup(currentId)));
+  const panel = el('div', {class: 'panel'},
+    el('div', {class: 'lrow'}, el('span', {text: 'Week'}), weekGroup(currentId)),
+    el('div', {class: 'lrow'}, el('span', {text: 'Status'}), statusGroup(currentId)),
+    labelRows,
+    el('div', {class: 'note'}, el('div', {}, el('b', {text: 'Claude: '}), t.note || 'No proposal yet. Showing the current labels.'),
+      el('div', {class: 'diff', text: ch.length ? 'Will change in Linear: ' + ch.join(' · ') : 'No change to Linear labels.'})),
+    el('div', {class: 'actions'}, accept, undo, reset, el('span', {class: 'hint', text: 'Underlined = current value in Linear'})));
+
+  document.getElementById('main').replaceChildren(el('article', {class: 'ticket'},
+    el('div', {class: 'tmeta'}, el('a', {href: t.url, target: '_blank', rel: 'noopener', text: t.id}),
+      el('span', {text: `${t.status} · ${t.age}d old · ${t.assignee || 'unassigned'}`}),
+      el('span', {text: 'labels now: ' + (t.labels.join(', ') || 'none')})),
+    el('h2', {text: t.title}), panel, renderDesc(t.desc)));
+}
+
+function renderAll() { renderQueue(); renderMain(); }
+
+async function update(id, patch) {
+  const next = Object.assign({}, chosen(id), STATE[id] || {}, patch, {at: new Date().toISOString()});
+  STATE[id] = next;
+  try { localStorage.setItem(LS, JSON.stringify(STATE)); } catch (e) {}
+  renderAll();
+  const s = document.getElementById('save');
+  if (!db) { s.textContent = 'Saved in this browser only'; return; }
+  try { await db.collection('labels').doc(id).set(next); s.textContent = 'Saved · ' + new Date().toLocaleTimeString(); }
+  catch (e) { s.textContent = 'Save failed (' + (e.code || 'error') + '); kept in this browser'; }
+}
+
+document.getElementById('filters').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  filter = b.dataset.f;
+  document.querySelectorAll('#filters button').forEach(x => x.setAttribute('aria-pressed', String(x === b)));
+  renderQueue();
+});
+
+document.getElementById('built').textContent = 'Linear pull · ' + D.pulled;
+renderAll();
+
+(async () => {
+  try { db = await window.claude?.use?.('db'); } catch (e) { db = null; }
+  const s = document.getElementById('save');
+  if (!db) { s.textContent = 'Saving in this browser only'; return; }
+  s.textContent = 'Connected · choices save for Claude';
+  db.collection('labels').onSnapshot(snap => {
+    for (const d of snap.docs) STATE[d.id] = Object.assign({}, d.data());
+    renderAll();
+  }, e => { s.textContent = 'Disconnected (' + e.code + '); saving in this browser'; db = null; });
+})();
+</script>

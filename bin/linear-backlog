@@ -13,13 +13,21 @@ Subcommands:
   grep PATTERN              search titles and descriptions
   stats                     label, status and project counts
   stale                     days since a human last touched each ticket
+  page --out FILE           render the triage page (labels and status per ticket)
+  apply DECISIONS [--yes]   write the page's saved decisions back to Linear
 
 Run it through keyfile so LINEAR_KEY reaches the process:
 
     keyfile run linear -- linear-backlog fetch
     linear-backlog index --nolabel --older 90
 
-`fetch` and `stale` are the only subcommands that need the key or the network.
+`fetch`, `stale` and `apply` are the only subcommands that need the key or the
+network.
+
+The triage page reads label proposals from proposals.json beside the store:
+{"SAV-1": {"area", "feat", "source", "tags", "note", "hash"}}, where `hash` is
+the ticket's content hash when the proposal was written. `page` lists tickets
+whose proposal is missing or stale.
 
 The store defaults to ~/.cache/linear-backlog/backlog.json; override with
 LINEAR_BACKLOG_STORE or --store.
@@ -27,6 +35,7 @@ LINEAR_BACKLOG_STORE or --store.
 
 import argparse
 import datetime
+import hashlib
 import json
 import os
 import pathlib
@@ -144,9 +153,24 @@ def cmd_fetch(args) -> None:
 
     args.store.parent.mkdir(parents=True, exist_ok=True)
     args.store.write_text(json.dumps(rows, indent=1))
+    _labels_path(args.store).write_text(json.dumps(_fetch_labels(), indent=1))
     empty = sum(1 for r in rows if not r['description'].strip())
     print(f'wrote {len(rows)} issues to {args.store} ({empty} with an empty description)',
           file=sys.stderr)
+
+
+_LABELS = '''{ issueLabels(first: 250) { nodes { id name isGroup retiredAt parent { name } } } }'''
+
+
+def _fetch_labels() -> list[dict]:
+    nodes = _gql(_LABELS)['issueLabels']['nodes']
+    return [{'id': n['id'],
+             'name': f"{n['parent']['name']}/{n['name']}" if n.get('parent') else n['name']}
+            for n in nodes if not n['isGroup'] and not n.get('retiredAt')]
+
+
+def _labels_path(store: pathlib.Path) -> pathlib.Path:
+    return store.with_name('labels.json')
 
 
 # --------------------------------------------------------------------------- queries
@@ -174,6 +198,8 @@ def _select(rows: list[dict], args) -> list[dict]:
         out = [r for r in out if not any(l.startswith('Area/') for l in r.get('labels') or [])]
     if args.nofeat:
         out = [r for r in out if not any(l.startswith('Feat/') for l in r.get('labels') or [])]
+    if getattr(args, 'noproject', False):
+        out = [r for r in out if not r.get('project') or r.get('projectState') == 'completed']
     if args.status:
         out = [r for r in out if (r.get('status') or '').lower() == args.status.lower()]
     if args.older:
@@ -300,6 +326,163 @@ def cmd_stale(args) -> None:
               f"{(r['actor'] or '-')[:17]:<18} {(r['assignee'] or '-')[:13]:<14} {r['title'][:44]}")
 
 
+# --------------------------------------------------------------------------- page
+
+# The label groups and type tags the triage page edits. Labels outside these are
+# never touched by `apply`.
+_GROUPS = {'area': 'Area', 'feat': 'Feat', 'source': 'Source'}
+_TAGS = ['Bug', 'Feature', 'Model Error', 'DX', 'Icebox']
+_TEMPLATE = pathlib.Path(__file__).resolve().parent.parent / 'share' / 'linear-backlog' / 'triage.html'
+
+
+def _proposals_path(store: pathlib.Path) -> pathlib.Path:
+    return store.with_name('proposals.json')
+
+
+def _content_hash(r: dict) -> str:
+    return hashlib.sha1((r['title'] + '\n' + r['description']).encode()).hexdigest()[:12]
+
+
+def _current(r: dict) -> dict:
+    def one(group: str) -> str:
+        return next((l.split('/', 1)[1] for l in r['labels'] if l.startswith(group + '/')), '')
+    return {**{k: one(g) for k, g in _GROUPS.items()}, 'tags': [l for l in r['labels'] if l in _TAGS]}
+
+
+def cmd_page(args) -> None:
+    """Render the triage page from the store and cached proposals.
+
+    A proposal is keyed to the ticket's title and description, so it goes stale
+    when the ticket's content changes but not when only its labels or status do.
+    """
+    rows = sorted(_select(_load(args.store), args), key=lambda r: _days(r['createdAt']))
+    proposals = json.loads(_proposals_path(args.store).read_text()) \
+        if _proposals_path(args.store).exists() else {}
+    labels = [l['name'] for l in json.loads(_labels_path(args.store).read_text())]
+
+    tickets, missing = [], []
+    for r in rows:
+        cur = _current(r)
+        p = proposals.get(r['id'])
+        if not p or p.get('hash') != _content_hash(r):
+            missing.append(r['id'])
+            p = {}
+        prop = {k: p.get(k, cur[k]) for k in _GROUPS}
+        prop['tags'] = sorted(set(cur['tags']) | set(p.get('tags', [])))
+        tickets.append({
+            'id': r['id'], 'title': r['title'], 'url': r['url'], 'status': r['status'],
+            'assignee': r['assignee'], 'age': _days(r['createdAt']), 'labels': r['labels'],
+            'cur': cur, 'prop': prop, 'note': p.get('note', ''), 'desc': r['description'],
+        })
+
+    data = {
+        'tickets': tickets,
+        'pulled': datetime.datetime.fromtimestamp(args.store.stat().st_mtime).strftime('%b %-d, %H:%M'),
+        **{k + 's': sorted(l.split('/', 1)[1] for l in labels if l.startswith(g + '/'))
+           for k, g in _GROUPS.items()},
+        'tags': _TAGS,
+    }
+    # Keep `</script>` inside a description from closing the data block.
+    payload = json.dumps(data).replace('</', '<\\/')
+    args.out.write_text(_TEMPLATE.read_text().replace('__DATA__', payload))
+    print(f'wrote {len(tickets)} tickets to {args.out}', file=sys.stderr)
+    if missing:
+        print(f'{len(missing)} without a current proposal: {" ".join(missing)}', file=sys.stderr)
+
+
+# --------------------------------------------------------------------------- apply
+
+_ISSUE = '''query($id: String!) {
+  issue(id: $id) {
+    id identifier
+    labels { nodes { id name parent { name } } }
+    team { states { nodes { id name type } } }
+  }
+}'''
+
+_UPDATE = '''mutation($id: String!, $input: IssueUpdateInput!) {
+  issueUpdate(id: $id, input: $input) { success }
+}'''
+
+_RELATE = '''mutation($input: IssueRelationCreateInput!) {
+  issueRelationCreate(input: $input) { success }
+}'''
+
+
+def _decisions(path: pathlib.Path) -> dict[str, dict]:
+    """Read decisions saved by the triage page: one JSON file per ticket, or one
+    JSON object keyed by ticket id."""
+    if path.is_dir():
+        out = {}
+        for f in sorted(path.rglob('*.json')):
+            doc = json.loads(f.read_text())
+            out[f.stem] = doc.get('data', doc) if isinstance(doc.get('data'), dict) else doc
+        return out
+    return json.loads(path.read_text())
+
+
+def _plan(issue: dict, d: dict, label_ids: dict[str, str]) -> tuple[dict, list[str]]:
+    """The issueUpdate input for one decision, plus a human-readable summary."""
+    states = issue['team']['states']['nodes']
+    status = d.get('status') or ''
+    if status:
+        if status == 'done':
+            state = next(s for s in states if s['type'] == 'completed')
+        else:
+            canceled = [s for s in states if s['type'] == 'canceled']
+            state = next((s for s in canceled if status == 'duplicate' and s['name'] == 'Duplicate'),
+                         canceled[0])
+        note = f"→ {state['name']}" + (f" (duplicate of {d.get('duplicateOf')})" if status == 'duplicate' else '')
+        return {'stateId': state['id']}, [note]
+    if not d.get('reviewed'):
+        return {}, []
+
+    have = [f"{l['parent']['name']}/{l['name']}" if l.get('parent') else l['name']
+            for l in issue['labels']['nodes']]
+    managed = lambda n: n in _TAGS or any(n.startswith(g + '/') for g in _GROUPS.values())
+    want = [n for n in have if not managed(n)]
+    want += [f'{g}/{d[k]}' for k, g in _GROUPS.items() if d.get(k)]
+    want += [t for t in d.get('tags', []) if t in _TAGS]
+    if sorted(want) == sorted(have):
+        return {}, []
+    unknown = [n for n in want if n not in label_ids and managed(n)]
+    if unknown:
+        _die(f"{issue['identifier']}: unknown label(s) {unknown}")
+    summary = [f'+{n}' for n in want if n not in have] + [f'-{n}' for n in have if n not in want]
+    by_name = {f"{l['parent']['name']}/{l['name']}" if l.get('parent') else l['name']: l['id']
+               for l in issue['labels']['nodes']}
+    return {'labelIds': [by_name.get(n) or label_ids[n] for n in want]}, summary
+
+
+def cmd_apply(args) -> None:
+    """Apply triage-page decisions to Linear. Dry run unless --yes.
+
+    A status decision wins over label edits on the same ticket; label edits apply
+    only to tickets the page marked reviewed.
+    """
+    label_ids = {l['name']: l['id'] for l in _fetch_labels()}
+    planned = []
+    for tid, d in sorted(_decisions(args.decisions).items()):
+        issue = _gql(_ISSUE, {'id': tid})['issue']
+        update, summary = _plan(issue, d, label_ids)
+        if update:
+            planned.append((issue, d, update))
+            print(f"{tid:<9} {' '.join(summary)}")
+    if not planned:
+        print('nothing to apply', file=sys.stderr)
+        return
+    if not args.yes:
+        print(f'\n{len(planned)} ticket(s) would change. Re-run with --yes to apply.', file=sys.stderr)
+        return
+    for issue, d, update in planned:
+        if d.get('status') == 'duplicate' and d.get('duplicateOf'):
+            dup = _gql(_ISSUE, {'id': d['duplicateOf']})['issue']
+            _gql(_RELATE, {'input': {'issueId': issue['id'], 'relatedIssueId': dup['id'],
+                                     'type': 'duplicate'}})
+        _gql(_UPDATE, {'id': issue['id'], 'input': update})
+    print(f'applied {len(planned)} change(s)', file=sys.stderr)
+
+
 # --------------------------------------------------------------------------- cli
 
 def main() -> None:
@@ -316,6 +499,8 @@ def main() -> None:
         p.add_argument('--nolabel', action='store_true', help='only tickets with no labels')
         p.add_argument('--noarea', action='store_true', help='only tickets missing an Area/ label')
         p.add_argument('--nofeat', action='store_true', help='only tickets missing a Feat/ label')
+        p.add_argument('--noproject', action='store_true',
+                       help='only tickets with no project, or whose project has completed')
         p.add_argument('--older', type=int, metavar='DAYS')
         p.add_argument('--newer', type=int, metavar='DAYS')
 
@@ -345,6 +530,17 @@ def main() -> None:
     p = sub.add_parser('stale', help='days since a human last touched each ticket')
     add_filters(p)
     p.set_defaults(func=cmd_stale)
+
+    p = sub.add_parser('page', help='render the triage page for a set of tickets')
+    add_filters(p)
+    p.add_argument('--out', type=pathlib.Path, required=True)
+    p.set_defaults(func=cmd_page)
+
+    p = sub.add_parser('apply', help='apply triage-page decisions to Linear (dry run unless --yes)')
+    p.add_argument('decisions', type=pathlib.Path,
+                   help='directory of per-ticket JSON files, or one JSON object keyed by ticket id')
+    p.add_argument('--yes', action='store_true', help='actually write to Linear')
+    p.set_defaults(func=cmd_apply)
 
     args = ap.parse_args()
     args.func(args)
