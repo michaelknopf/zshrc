@@ -294,6 +294,145 @@ accounts:
           - quota alerts
         archive: true
       - criteria:
+          from: noreply@github.com
+          subject: is requesting updated permissions
+        labels:
+          - GitHub/App Permissions
+        archive: true
+      - criteria:
+          from: noreply@openrouter.ai
+          subject: Unrecognized device
+        labels:
+          - OpenRouter/Security
+      - criteria:
+          from: googledevelopers-noreply@google.com
+          subject: OAuth Brand Verification
+        labels:
+          - GCP/Action Advised
+      - criteria:
+          from: aws@savisecurity.com
+          subject: AWS Marketplace
+        labels:
+          - AWS
+      - criteria:
+          from: edt.cio.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: amanda@oboxconsulting.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: reviews@campaigns.g2.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: team@sutro.sh
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: contact.elevenlabs.io
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: hello.webflow.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: advertise-noreply@global.metamail.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: noreply@ads.google.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: no-reply@updates.rippling.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: krosefr@amazon.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          from: ads-account-noreply@ads.google.com
+        labels:
+          - marketing
+        archive: true
+      - criteria:
+          subject: 'Canceled event:'
+          query: filename:invite.ics
+        labels:
+          - Calendar
+        archive: true
+      - criteria:
+          subject: 'Updated invitation:'
+          query: filename:invite.ics
+        labels:
+          - Calendar
+        archive: true
+      - criteria:
+          from: firebase-noreply@google.com
+          subject: '[Action Required]'
+        labels:
+          - GCP/Action Advised
+      - criteria:
+          from: workspace-noreply@google.com
+          subject: '[Action Required]'
+        labels:
+          - GCP/Action Advised
+      - criteria:
+          from: googleaistudio-noreply@google.com
+        labels:
+          - GCP/Action Advised
+      - criteria:
+          from: google-workspace-alerts-noreply@google.com
+        labels:
+          - Google/Security
+      - criteria:
+          from: no-reply@accounts.google.com
+          subject: Google Account
+        labels:
+          - Google/Security
+      - criteria:
+          from: aws@savisecurity.com
+          subject: '[Action Required]'
+        labels:
+          - AWS
+      - criteria:
+          from: no-reply@sns.amazonaws.com
+          subject: Subscription Confirmation
+        labels:
+          - AWS
+      - criteria:
+          from: portal@telnyx.com
+          subject: API key was used
+        labels:
+          - Telnyx/Notices
+      - criteria:
+          from: noreply-appledev@email.apple.com
+        labels:
+          - Apple
+      - criteria:
+          from: no-reply-googleplay-developer@google.com
+        labels:
+          - Google/Play Console
+      - criteria:
+          from: no-reply@rippling.com
+          subject: anniversaries and birthdays
+        labels:
+          - updates
+      - criteria:
           from: codecov[bot]
         labels: []
         archive: true
@@ -849,3 +988,4 @@ accounts:
         - from:no-reply@sns.amazonaws.com subject:savi-ci
         - from:admin@savisecurity.com subject:"[GitHub]"
         - from:hello@savisecurity.com subject:"wrong number"
+        - label:"OpenRouter/Security"
