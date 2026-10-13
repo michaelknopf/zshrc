@@ -447,8 +447,29 @@ accounts:
           - Intercom
       - criteria:
           from: email.figma.com
+          subject: new comments in
         labels:
-          - Figma
+          - Figma/Comments
+      - criteria:
+          from: email.figma.com
+          subject: replied to a thread in
+        labels:
+          - Figma/Comments
+      - criteria:
+          from: email.figma.com
+          subject: mentioned you in
+        labels:
+          - Figma/Mentions
+      - criteria:
+          from: email.figma.com
+          subject: were mentioned in
+        labels:
+          - Figma/Mentions
+      - criteria:
+          from: no-reply@email.figma.com
+          subject: invited you
+        labels:
+          - Figma/Access
       - criteria:
           from: payments-noreply@google.com
         labels:
@@ -733,9 +754,8 @@ accounts:
           - MaxMind
       - criteria:
           from: support+notifications@figma.com
-          subject: You can now view
         labels:
-          - Figma
+          - Figma/Access
       - criteria:
           from: developer@insideapple.apple.com
         labels:
@@ -951,7 +971,9 @@ accounts:
         - label:"Firebase/Missing dSYM"
         - label:"Google/Security"
         - label:"Apple/TestFlight"
-        - label:Figma
+        - label:"Figma/Comments"
+        - label:"Figma/Mentions"
+        - label:"Figma/Access"
         - label:"Google Docs"
         - label:"Google Drive/Shares"
         - label:"Rippling/Tasks"
