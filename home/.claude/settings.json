@@ -55,7 +55,8 @@
     "firebase@firebase": false,
     "figma@claude-plugins-official": true,
     "savi@savi-live": true,
-    "mk@savi-live": true
+    "mk@savi-live": true,
+    "savi-cowork@cowork-plugin": false
   },
   "extraKnownMarketplaces": {
     "marimo-pair": {
