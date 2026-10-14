@@ -56,7 +56,7 @@
     "figma@claude-plugins-official": true,
     "savi@savi-live": true,
     "mk@savi-live": true,
-    "savi-cowork@cowork-plugin": false
+    "savi-cowork@synced": false
   },
   "extraKnownMarketplaces": {
     "marimo-pair": {
@@ -84,6 +84,7 @@
       }
     }
   },
+  "outputStyle": "Concise",
   "alwaysThinkingEnabled": false,
   "effortLevel": "high",
   "awaySummaryEnabled": true,
@@ -106,6 +107,5 @@
     "Search",
     "Read",
     "WebSearch"
-  ],
-  "outputStyle": "Concise"
+  ]
 }
