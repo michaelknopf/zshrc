@@ -445,19 +445,10 @@ accounts:
           from: notifications@savi-security.intercom-mail.com
         labels:
           - Intercom
+      # Figma sends mentions from the same comments-* address; those go to Figma/Mentions.
       - criteria:
           from: email.figma.com
-          subject: new comments in
-        labels:
-          - Figma/Comments
-      - criteria:
-          from: email.figma.com
-          subject: replied to a thread in
-        labels:
-          - Figma/Comments
-      - criteria:
-          from: email.figma.com
-          subject: left a comment in
+          query: from:comments -subject:mentioned
         labels:
           - Figma/Comments
       - criteria:
