@@ -457,6 +457,11 @@ accounts:
           - Figma/Comments
       - criteria:
           from: email.figma.com
+          subject: left a comment in
+        labels:
+          - Figma/Comments
+      - criteria:
+          from: email.figma.com
           subject: mentioned you in
         labels:
           - Figma/Mentions
