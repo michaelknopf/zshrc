@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vendor inventory — $period_label</title>
+<meta name="description" content="What vendors cost Savi in $period_label, how much credits and prepaid plans cover, and how long the credits last.">
+<link rel="stylesheet" href="https://museum.savisecurity.com/style/house/2.1.0/house.css">
+<script src="https://museum.savisecurity.com/style/house/2.1.0/house.js" defer></script>
+<style>
+:root {
+  --up: #b4462c; --down: #2f7d4f; --bar: var(--accent, #3a6ea5);
+  --paid: #3a6ea5; --prepaid: #9cb9d9; --credit-bg: #eef3f9; --credit-line: #3a6ea5;
+  --font: ui-sans-serif, -apple-system, "Segoe UI", Inter, system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --up: #e58a6f; --down: #6cc28f; --paid: #7aa7da; --prepaid: #3f5f84; --credit-bg: #1b2430; --credit-line: #7aa7da; } }
+:root[data-theme="dark"] { --up: #e58a6f; --down: #6cc28f; --paid: #7aa7da; --prepaid: #3f5f84; --credit-bg: #1b2430; --credit-line: #7aa7da; }
+:root[data-theme="light"] { --up: #b4462c; --down: #2f7d4f; --paid: #3a6ea5; --prepaid: #9cb9d9; --credit-bg: #eef3f9; --credit-line: #3a6ea5; }
+body { background: var(--page); color: var(--ink); font-family: var(--font); margin: 0; }
+main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: 28px; font-weight: 650; margin: 8px 0 24px; letter-spacing: -0.01em; }
+h2 { font-size: 15px; font-weight: 600; color: var(--ink-2); margin: 32px 0 10px; text-transform: none; }
+h3 { font-size: 16px; font-weight: 600; margin: 0 0 14px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 8px; }
+.stat b { display: block; font-size: 30px; font-weight: 650; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.stat span { color: var(--ink-3); font-size: 13px; }
+.panel .stats .stat b { font-size: 22px; }
+ul.changes { list-style: none; padding: 0; margin: 0; }
+ul.changes li { display: grid; grid-template-columns: 1fr 110px 1fr; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--rule); align-items: baseline; }
+.delta { font-variant-numeric: tabular-nums; text-align: right; font-weight: 600; }
+.delta.up { color: var(--up); } .delta.down { color: var(--down); }
+.note, .dim { color: var(--ink-3); font-size: 13px; }
+details.coverage { margin-top: 32px; color: var(--ink-3); font-size: 13px; }
+details.coverage summary { cursor: pointer; }
+details.coverage ul { padding-left: 18px; margin: 8px 0 0; }
+details.coverage li { margin: 4px 0; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-weight: 500; color: var(--ink-3); font-size: 12px; padding: 6px 8px; border-bottom: 1px solid var(--rule-strong); }
+td { padding: 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th.n, td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+button.exp { all: unset; cursor: pointer; font-weight: 500; }
+button.exp::before { content: "›"; display: inline-block; width: 14px; color: var(--ink-3); transition: transform .12s; }
+button.exp[aria-expanded="true"]::before { transform: rotate(90deg); }
+button.exp:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+tr.more td { background: var(--wash); padding: 10px 8px 12px 30px; }
+dl.kv { margin: 0; display: grid; gap: 4px; }
+dl.kv div { display: grid; grid-template-columns: 90px 1fr; gap: 12px; }
+dl.kv dt { color: var(--ink-3); font-size: 13px; }
+dl.kv dd { margin: 0; }
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.panel { border: 1px solid var(--rule); border-radius: 10px; padding: 18px; }
+.panel.wide { grid-column: 1 / -1; }
+.panel table { margin-top: 16px; }
+figure { margin: 0; }
+.meter { height: 12px; border-radius: 6px; background: var(--wash); overflow: hidden; margin: 6px 0 4px; position: relative; }
+.meter i { display: block; height: 100%; background: var(--bar); }
+.meter-label { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+figcaption { font-size: 13px; color: var(--ink-3); margin-top: 8px; }
+.panel dl.kv { margin-top: 14px; }
+.panel dl.kv div { grid-template-columns: 1fr auto; }
+.panel dl.kv dd { font-variant-numeric: tabular-nums; text-align: right; }
+.empty { color: var(--ink-3); }
+.kicker { margin: 8px 0 2px; color: var(--ink-3); font-size: 14px; }
+.big { font-size: 46px; font-weight: 650; letter-spacing: -.02em; font-variant-numeric: tabular-nums; margin: 0 0 14px; }
+.big small { font-size: 18px; font-weight: 500; color: var(--ink-3); letter-spacing: 0; }
+.cost figure { margin: 40px 0 0; }
+.cost figure h2 { font-size: 16px; color: var(--ink); margin: 0 0 12px; }
+.cost figure h2 small { font-weight: 400; color: var(--ink-3); font-size: 13px; margin-left: 6px; }
+.chart { width: 100%; height: auto; display: block; overflow: visible; }
+.chart .lbl { font-size: 13px; fill: var(--ink-2); } .chart .strong { font-weight: 600; fill: var(--ink); }
+.chart .axis { font-size: 12px; fill: var(--ink-3); }
+.key { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); margin-top: 4px; }
+.sw { display: inline-block; width: 14px; height: 10px; vertical-align: -1px; margin-right: 6px; border-radius: 2px; }
+.sw.hatch { background: repeating-linear-gradient(135deg, var(--credit-line) 0 2px, var(--credit-bg) 2px 5px); border: 1px solid var(--credit-line); box-sizing: border-box; }
+.sw.dash { border: 1px dashed var(--ink-3); box-sizing: border-box; }
+@media (max-width: 640px) { .big { font-size: 36px; } }
+@media (max-width: 640px) {
+  .stats { grid-template-columns: 1fr; }
+  .grid { grid-template-columns: 1fr; }
+  ul.changes li { grid-template-columns: 1fr auto; }
+  ul.changes li .note { grid-column: 1 / -1; margin-top: -4px; }
+  h1 { font-size: 24px; }
+}
+</style>
+</head>
+<body>
+<header class="tabs">
+  <b class="doc-name">Vendors · $period_label</b>
+  <nav>
+    <a class="v" href="#cost">Cost</a>
+    <a class="v" href="#paid">Paid</a>
+    <a class="v" href="#code-only">Code only</a>
+    <a class="v" href="#other">Other spend</a>
+    <a class="v" href="#history">History</a>
+  </nav>
+</header>
+<main>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><pattern id="hatch" patternUnits="userSpaceOnUse" width="7" height="7" patternTransform="rotate(45)">
+<rect width="7" height="7" fill="var(--credit-bg)"/><line x1="0" y1="0" x2="0" y2="7" stroke="var(--credit-line)" stroke-width="3"/></pattern></defs></svg>
+<section class="view cost" id="cost" aria-label="Cost">
+  <p class="kicker" data-anchor="cost-kicker">What vendors cost in $period_label</p>
+  <p class="big" data-anchor="cost-total">$total <small>per month</small></p>
+  <div data-anchor="cost-split">$composition</div>
+  <div class="key" data-anchor="cost-key"><span><i class="sw" style="background:var(--paid)"></i>Paid in cash</span><span><i class="sw" style="background:var(--prepaid)"></i>Prepaid plan, share used this month</span><span><i class="sw hatch"></i>Covered by credits</span></div>
+
+  <figure data-anchor="cost-by-vendor">
+    <h2 data-anchor="cost-by-vendor-title">By vendor <small>$month_name, per month</small></h2>
+    $by_vendor
+    <figcaption>$by_vendor_caption</figcaption>
+  </figure>
+
+  <figure data-anchor="cost-trend">
+    <h2 data-anchor="cost-trend-title">Cost per month <small>last 12 months</small></h2>
+    $trend
+    <figcaption>$trend_caption</figcaption>
+  </figure>
+
+  <figure data-anchor="cost-balances">
+    <h2 data-anchor="cost-balances-title">Credits and prepaid plans <small>balance on $balances_as_of</small></h2>
+    $balances
+    <div class="key"><span><i class="sw hatch"></i>Used</span><span><i class="sw dash"></i>Expected use before it ends</span></div>
+    <figcaption>$balances_caption</figcaption>
+  </figure>
+
+  <details class="coverage" data-anchor="coverage">
+    <summary>How these numbers were made</summary>
+    <ul>$coverage</ul>
+  </details>
+</section>
+
+<section class="view" id="paid" aria-label="Paid vendors" hidden>
+  <h1 data-anchor="paid-title">Paid vendors used in code</h1>
+  <table data-anchor="paid-table">
+    <thead><tr data-anchor="paid-table-head"><th>Vendor</th><th class="n">$month_name</th><th class="n">12 months</th><th class="n" title="Months with a charge in the last 12">Months</th></tr></thead>
+    <tbody>$paid_rows</tbody>
+  </table>
+</section>
+
+<section class="view" id="code-only" aria-label="Code only" hidden>
+  <h1 data-anchor="code-title">Used in code, no Ramp charge</h1>
+  <table data-anchor="code-table">
+    <thead><tr data-anchor="code-table-head"><th>Vendor</th><th>Purpose</th><th>Why no charge</th></tr></thead>
+    <tbody>$code_rows</tbody>
+  </table>
+</section>
+
+<section class="view" id="other" aria-label="Other spend" hidden>
+  <h1 data-anchor="other-title">Other spend</h1>
+  <h2 data-anchor="other-noneng-title">Office, travel, devices and app stores</h2>
+  <table data-anchor="other-noneng-table">
+    <thead><tr data-anchor="other-noneng-table-head"><th>Vendor</th><th>Purpose</th><th class="n">$month_name</th><th class="n">12 months</th></tr></thead>
+    <tbody>$noneng_rows</tbody>
+  </table>
+  <h2 data-anchor="other-tooling-title">Tools not in code</h2>
+  <table data-anchor="other-tooling-table">
+    <thead><tr data-anchor="other-tooling-table-head"><th>Vendor</th><th>Purpose</th><th class="n">$month_name</th><th class="n">12 months</th></tr></thead>
+    <tbody>$tooling_rows</tbody>
+  </table>
+  <h2 data-anchor="other-unclassified-title">Unclassified</h2>
+  <table data-anchor="other-unclassified-table">
+    <thead><tr data-anchor="other-unclassified-table-head"><th>Vendor</th><th>Purpose</th><th class="n">$month_name</th><th class="n">12 months</th></tr></thead>
+    <tbody>$unclassified_rows</tbody>
+  </table>
+</section>
+
+<section class="view" id="history" aria-label="History" hidden>
+  <h1 data-anchor="history-title">Earlier reports</h1>
+  $history
+</section>
+
+<div class="pager">
+  <button type="button" data-pager="prev">Previous</button>
+  <span class="pos" data-pager="pos"></span>
+  <button type="button" data-pager="next">Next</button>
+</div>
+</main>
+
+<script type="application/json" id="vendor-inventory">
+$inventory
+</script>
+<script>
+document.addEventListener('click', function (ev) {
+  var b = ev.target.closest('button.exp');
+  if (!b) return;
+  var more = b.closest('tr').nextElementSibling;
+  var open = b.getAttribute('aria-expanded') === 'true';
+  b.setAttribute('aria-expanded', String(!open));
+  if (more && more.classList.contains('more')) more.hidden = open;
+});
+</script>
+</body>
+</html>

@@ -1,19 +1,19 @@
 ---
 name: vendor-report
 disable-model-invocation: true
-description: Build this period's third-party vendor inventory from Ramp spend, usage behind credits and a code sweep, and publish it to Museum
+description: Build this period's vendor cost report (cash, prepaid plans, credits, credit balances) and vendor inventory, and publish it to Museum
 argument-hint: "[--month | --quarter] [period, e.g. 2026-11 or 2026-Q4] [previous report URLs or slugs]"
-allowed-tools: Bash(uv run:*), Bash(keyfile list:*), Bash(keyfile run:*), Bash(aws secretsmanager list-secrets:*), Bash(bq query:*), Bash(curl:*), Bash(mkdir:*), Bash(date:*), Read, Write, AskUserQuestion, ToolSearch, Skill
+allowed-tools: Bash(uv run:*), Bash(keyfile list:*), Bash(keyfile run:*), Bash(aws secretsmanager list-secrets:*), Bash(aws ce get-cost-and-usage:*), Bash(bq query:*), Bash(curl:*), Bash(mkdir:*), Bash(date:*), Read, Write, AskUserQuestion, ToolSearch, Skill
 ---
 
 # /vendor-report — Third-party vendor inventory
 
-One report per period: every third-party vendor we pay or depend on, what it is for, which repos use it, and what it cost. Each run builds a new Museum artifact. The previous report is the starting point, so classifications carry forward and only what changed needs judgment.
+One report per period. Its front page answers what vendors cost per month, how much of that is cash, prepaid plans and credits, and how long the credits last. Behind it sit the inventory tabs: every vendor we pay or depend on, what it is for and which repos use it. Each run builds a new Museum artifact. The previous report is the starting point, so classifications carry forward and only what changed needs judgment.
 
 Four sources, with different jobs:
 
 - **Ramp decides what we paid.** Card, reimbursement and Bill Pay spend, per merchant. A vendor's charged cost comes only from Ramp.
-- **Usage APIs decide what credits and prepaid plans hide.** AWS, GCP, OpenRouter and Tavily cost more than Ramp shows, or burn a prepaid balance.
+- **Usage APIs and billing consoles decide what credits and prepaid plans hide.** AWS and GCP run on credits, OpenRouter bills beyond Ramp's top-ups, and Tavily burns a prepaid plan.
 - **The code decides what we depend on.** Packages, Terraform providers and API-key settings in `~/code/github/savi`. A vendor with no Ramp charge still belongs in the report if the code uses it.
 - **The previous report decides what each vendor is.** Its purpose, owner, billing note and grouping. Carry them forward unless this period's data contradicts them.
 
@@ -31,7 +31,7 @@ Four sources, with different jobs:
 
 Find the Museum tools with `ToolSearch` (`museum get artifact`, `museum publish`). The prefix depends on how the user connected the server, so refer to tools by what they do.
 
-Read the newest previous report with `get_artifact`. Every report embeds its inventory as JSON in `<script type="application/json" id="vendor-inventory">` (schema in Phase 6). Read the vendor rows from it. A report without that block predates this command: read its tables instead.
+Read the newest previous report with `get_artifact`. Every report embeds its inventory as JSON in `<script type="application/json" id="vendor-inventory">` (shape in `report/example-inventory.json`). Read the vendor rows from it. A report without that block predates this command: read its tables instead.
 
 Older reports given as arguments are context for trends only. Do not carry a classification from an older report over the newest one.
 
@@ -47,44 +47,59 @@ Run these with `query_scope: complete`, in parallel:
 
 Keep each payee's Ramp id (`search_tag_info.id`): it is the key that matches vendors across reports, since display names change.
 
-Ramp shows only the spend the signed-in user's role can see. If `ramp_token_info` reports `auth_level: user`, say so on the report's Summary view.
+Ramp shows only the spend the signed-in user's role can see. If `ramp_token_info` reports `auth_level: user`, say so in `coverage`.
 
-## Phase 3 — Usage behind credits and prepaid plans
+## Phase 3 — Cost behind credits and prepaid plans
 
-Ramp undercounts these vendors: AWS and GCP run on credits, OpenRouter routes through our own AWS and GCP keys (BYOK), and Tavily was bought in bulk. Report what each would cost, or how fast the prepaid balance is burning.
+Every cost figure on the front page is **per month**, split three ways:
+
+- **Paid:** cash, from Ramp, leaving out the purchase of a prepaid plan, which is counted under prepaid as it is used.
+- **Prepaid:** the share of a prepaid plan used that month. A plan bought once (Tavily) is spread over the months it is used, by usage, not over the calendar. The month it was bought shows only that month's share.
+- **Credits:** usage AWS and GCP startup credits covered.
 
 Report one total per vendor. Breakdowns by service, project or model belong in a cost investigation, not this report.
 
-The OpenRouter and Tavily figures are running totals, not per-period amounts. Store each reading in the inventory JSON (Phase 6) and take the period's usage as the difference from the previous report's reading. A first report records the baseline and says the period figure starts next time.
+Collect each of these for the **last 12 months**, by month, so the trend chart can be drawn. A previous report's `cost.months` already holds the earlier months: take those, and fetch only the months it lacks.
 
-- **AWS.** Load the `savi:aws-cost-analysis` skill and run its fetch, with `--months 3` on a quarterly run. Follow its rules for reading the bundle: its figures are usage before credits, and `record_type_totals` gives the credits applied. Report usage and credits for the period.
-- **GCP.** The billing account exports standard usage cost to BigQuery (`savi-security.billing_export`, created in gcp-tf). Query the period's usage and credits, with `invoice.month` as `YYYYMM` (`IN` both months on a quarterly run):
+- **AWS.** Load the `savi:aws-cost-analysis` skill and run its fetch with `--months 12`. Its figures are usage before credits; `record_type_totals` gives the credits applied. Usage counts as credits while a credit balance remains.
+- **GCP.** The billing account exports standard usage cost to BigQuery (`savi-security.billing_export`, created in gcp-tf), from November 2026:
 
   ```bash
   bq query --project_id=savi-security --use_legacy_sql=false --format=prettyjson '
-    SELECT ROUND(SUM(cost), 2) AS usage_usd,
+    SELECT invoice.month AS month, ROUND(SUM(cost), 2) AS usage_usd,
            ROUND(SUM(IFNULL((SELECT SUM(c.amount) FROM UNNEST(credits) c), 0)), 2) AS credits_usd
     FROM `savi-security.billing_export.gcp_billing_export_v1_01B643_761629_CA8FDF`
-    WHERE invoice.month = "202611"'
+    WHERE invoice.month >= "202511" GROUP BY 1 ORDER BY 1'
   ```
 
-  `cost` is usage before credits, the same figure as the console's "Usage cost". The export was switched on in November 2026, so the table may not hold an earlier period. If the query returns nothing for the period, ask the user for the console total (Billing → Reports, savings unticked), or read it there with Claude in Chrome.
-- **OpenRouter.** With a management key, `GET https://openrouter.ai/api/v1/keys` lists every key with its usage. Without one, read the local key alone and say the figure covers that key only:
+  `cost` is usage before credits, the console's "Usage cost". For months before the export, take them from the previous report, or read the console (Billing → Reports, grouped by month, savings unticked) with Claude in Chrome.
+- **OpenRouter.** Sum `usage` across every key in every OpenRouter workspace (`GET https://openrouter.ai/api/v1/keys?workspace_id=…`; the workspace ids are in the previous report's `usage.openrouter.workspaces`). That needs a management key: read it from the macOS keychain (`security find-generic-password -a openrouter -s openrouter-management-key -w`) inside a script that never prints it. If it is missing or expired, ask the user to create one in the OpenRouter dashboard. Leave out `byok_usage`: it is billed to our AWS and GCP accounts, so their usage already counts it.
+- **Tavily.** Harbor logs every search. Count the plan credits used per month (an advanced search costs 2, a basic one 1) with the Savi Lake `run_sql` tool:
 
-  ```bash
-  keyfile run openrouter -- sh -c 'curl -s https://openrouter.ai/api/v1/key -H "Authorization: Bearer $SAVI_LLM__OPENROUTER_API_KEY"'
+  ```sql
+  SELECT date_trunc('month', created_at)::date AS month,
+         SUM(CASE WHEN search_depth = 'advanced' THEN 2 ELSE 1 END) AS credits
+  FROM harbor.web_search_tavily_bronze GROUP BY 1 ORDER BY 1
   ```
 
-  Record `usage`: what OpenRouter bills us, and the only OpenRouter figure the report shows. Leave out `byok_usage`. It is billed to our AWS and GCP keys, so AWS and GCP usage already count it.
-- **Tavily.**
+  A month's prepaid cost is its credits times the plan's price per credit. The plan's price, credits and term are in the previous report's `prepaid`. Check the sum against Tavily's own counter, which should agree within a fraction of a percent:
 
   ```bash
   keyfile run tavily -- sh -c 'curl -s https://api.tavily.com/usage -H "Authorization: Bearer $SAVI_TAVILY__API_KEY"'
   ```
 
-  Record `account.plan_usage` and `account.plan_limit`. Report the period's credits used, the share of the plan left, and the date it runs out at the trailing burn rate (the average period usage across the previous reports, or this period alone if there is only one).
+  Record `account.plan_usage` and `account.plan_limit`. If a new plan has been bought, ask the user for its price and credits.
 
-Never print a key: always pass it through `keyfile run`.
+Never print a key: pass it through `keyfile run` or a script.
+
+### Credit balances
+
+Neither the billing export nor Cost Explorer shows what a credit grant started at, has left, or when it ends. Read both consoles with Claude in Chrome:
+
+- **GCP:** the billing account's Billing → Credits page. Scroll the Issued Credits table right for start and end dates. The Spend-based Milestones tab shows grants still to come.
+- **AWS:** the mgmt account's credits page, opened through the user's IAM Identity Center session rather than an IAM sign-in. Build the URL from the `mgmt-sso-read` profile's `sso_start_url`, `sso_account_id` and `sso_role_name`: `<start url>/#/console?account_id=<id>&role_name=<role>&destination=https%3A%2F%2Fus-east-1.console.aws.amazon.com%2Fbilling%2Fhome%23%2Fcredits`. Use the estimated figures: the others lag to the last invoice.
+
+For each grant record what was granted, what is left, when it ends, and the period's credits applied as its monthly burn. Grants promised but not yet issued, such as a tranche that unlocks after part of a grant is used, go in `pending_credits` and the balances chart's caption. Carry them forward from the previous report and drop them once issued or lapsed.
 
 ## Phase 4 — Code sweep (quarterly)
 
@@ -117,46 +132,43 @@ Start from the previous report's rows and update them:
 
 Groups: `paid-in-code` (charged on Ramp and used in code), `code-only`, `non-engineering` (office, travel, devices, app stores), `unclassified`.
 
-Then compare with the previous report: new vendors, dropped vendors, and any vendor whose period spend moved by more than 25% and $50. These are the report's headline.
+Compare with the previous report for your own judgment: new vendors, dropped vendors, and big movers. They do not get their own list on the page; mention one in a chart caption only if it explains the month.
 
 ## Phase 6 — Build the artifact
 
-Read Museum's `get_authoring_guide` before writing. Use the house kit with one view per topic:
+The page is generated from the inventory JSON. Write the JSON, then render it:
 
-- **Summary:** total Ramp spend for the period and trailing 12 months, usage behind credits, the changes from Phase 5, and the data's coverage limits.
-- **Paid vendors:** the `paid-in-code` table: vendor, purpose, repos, period spend, trailing-12-month spend, active months, billing.
-- **Code-only:** vendors the code depends on with no Ramp charge, and why (credits, free tier, billed elsewhere) where known.
-- **Usage:** the Phase 3 figures. AWS and GCP usage before credits next to the credits applied; OpenRouter's billed usage, excluding BYOK; Tavily credits used this period, plan remaining, and projected run-out date. Across several reports, a trend chart per vendor.
-- **Other spend:** `non-engineering` and `unclassified`.
-- **History:** links to the previous reports, each with `target="_blank"`.
-
-Give every table row a `data-anchor` built from the vendor's Ramp id, or a slug of its name for a code-only vendor (`vendor-<id>`). The same vendor gets the same anchor in every report, which keeps comments meaningful across reports.
-
-Embed the inventory for the next run:
-
-```html
-<script type="application/json" id="vendor-inventory">
-{"period": "2026-11", "cadence": "month", "swept_code": true,
- "vendors": [{"name": "Twilio", "ramp_id": "1fe0…", "group": "paid-in-code",
-   "purpose": "Voice and SMS", "owner": null, "repos": ["harbor", "voice-agent"],
-   "billing": "card, monthly", "period_spend": 151.20, "ttm_spend": 1816.32,
-   "active_months": 10}],
- "usage": {
-   "aws": {"usage_usd": 4210.55, "credits_usd": -4210.55, "months": ["2026-11"]},
-   "gcp": {"usage_usd": null, "source": "not measured"},
-   "openrouter": {"as_of": "2026-12-01", "keys": "local key only",
-                  "usage_total_usd": 0},
-   "tavily": {"as_of": "2026-12-01", "plan": "Scale",
-              "plan_usage_total": 2279445, "plan_limit": 3600000}}}
-</script>
+```bash
+uv run --no-project python "${CLAUDE_SKILL_DIR}/report/build_report.py" inventory.json index.html
 ```
 
-`ramp_id` is null for a code-only vendor; `owner` is null until someone fills it in. Amounts are USD. The `*_total` fields are the raw running totals Phase 3 diffs against; keep their names stable.
+`report/example-inventory.json` shows the shape with made-up figures; the previous report's embedded JSON is the real starting point. The page has these views:
+
+- **Cost (front page):** the period's monthly total, split into paid, prepaid and credits, then three charts and nothing else: cost by vendor, cost per month over 12 months, and credit and prepaid balances. Credits are always drawn hatched.
+- **Paid, Code only, Other spend:** the inventory tables from Phase 5.
+- **History:** links to the previous reports.
+
+What you write into the JSON beyond the data:
+
+- **`cost.by_vendor`:** the period's top vendors by total, then one "Everything else" row. About eight rows.
+- **`cost.captions`:** one sentence under each chart saying what it shows, in plain words, with no figure the chart already labels unless it is the point.
+- **`coverage`:** the data's limits, shown collapsed under the charts. Keep the standing ones from the previous report and add any this period introduces (a role that can't see all Ramp spend, a month read from a console, a missing source).
+- **`credits[].chart`:** false for a grant too small to matter on the page, such as support credits. It stays in the JSON.
+
+The generator computes what goes unused or when a balance runs out, assuming this period's burn continues.
+
+Table rows get a `data-anchor` from the vendor's Ramp id, or a slug of its name for a code-only vendor (`vendor-<id>`), so comments stay meaningful across reports. The `*_total` fields are raw running totals; keep their names stable.
+
+Render the page with headless Chrome and look at it before publishing:
+
+```bash
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new --hide-scrollbars --virtual-time-budget=4000 --window-size=940,1500 --screenshot="$PWD/report.png" "file://$PWD/index.html"
+```
 
 ## Phase 7 — Publish
 
-Print the Summary view's headline (totals, new and dropped vendors, big movers, unclassified count) as reply text, then ask with `AskUserQuestion` whether to publish.
+Show the user the screenshot and the headline (the monthly total and its split, and any credit balance that will expire unused or run out), then ask with `AskUserQuestion` whether to publish.
 
-Publish a **new artifact** for each period, not a new version of the last one: each report is a fixed record of its period. Title it `Vendor inventory — <period>`, with `short_title` `Vendors <period>`. Set props with `list_props` for the options: `type: Reference`, `tier: Memo`, and the closest `initiative`. Fix any convention warnings `publish` returns in a second version.
+Read Museum's `get_authoring_guide` before the first publish. Publish a **new artifact** for each period, not a new version of the last one: each report is a fixed record of its period. Title it `Vendor inventory — <period>`, with `short_title` `Vendors <period>`. Set props with `list_props` for the options: `type: Reference`, `tier: Memo`, and the closest `initiative`. Fix any convention warnings `publish` returns in a second version.
 
 Leave earlier reports Current. Give the user the new report's URL.
