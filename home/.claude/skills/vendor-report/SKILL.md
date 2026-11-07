@@ -3,7 +3,7 @@ name: vendor-report
 disable-model-invocation: true
 description: Build this period's third-party vendor inventory from Ramp spend, usage behind credits and a code sweep, and publish it to Museum
 argument-hint: "[--month | --quarter] [period, e.g. 2026-11 or 2026-Q4] [previous report URLs or slugs]"
-allowed-tools: Bash(uv run:*), Bash(keyfile list:*), Bash(keyfile run:*), Bash(aws secretsmanager list-secrets:*), Bash(bq ls:*), Bash(curl:*), Bash(mkdir:*), Bash(date:*), Read, Write, AskUserQuestion, ToolSearch, Skill
+allowed-tools: Bash(uv run:*), Bash(keyfile list:*), Bash(keyfile run:*), Bash(aws secretsmanager list-secrets:*), Bash(bq query:*), Bash(curl:*), Bash(mkdir:*), Bash(date:*), Read, Write, AskUserQuestion, ToolSearch, Skill
 ---
 
 # /vendor-report — Third-party vendor inventory
@@ -56,7 +56,19 @@ Ramp undercounts these vendors: AWS and GCP run on credits, OpenRouter routes th
 The OpenRouter and Tavily figures are running totals, not per-period amounts. Store each reading in the inventory JSON (Phase 6) and take the period's usage as the difference from the previous report's reading. A first report records the baseline and says the period figure starts next time.
 
 - **AWS.** Load the `savi:aws-cost-analysis` skill and run its fetch, with `--months 3` on a quarterly run. Follow its rules for reading the bundle: its figures are usage before credits, and `record_type_totals` gives the credits applied. Report usage and credits for the period and the top services by usage.
-- **GCP.** We have no billing export to BigQuery, so the CLI cannot see cost. Ask the user for the period's total from Billing → Reports in the console, with credits ("Promotions and others") unticked. If they skip it, show GCP as not measured. If a billing export dataset appears in any project (`bq ls --project_id=<project>`), query it instead and drop this step.
+- **GCP.** The billing account exports standard usage cost to BigQuery (`savi-security.billing_export`, created in gcp-tf). Query the period's usage and credits per service, with `invoice.month` as `YYYYMM` (`IN` both months on a quarterly run):
+
+  ```bash
+  bq query --project_id=savi-security --use_legacy_sql=false --format=prettyjson '
+    SELECT service.description AS service,
+           ROUND(SUM(cost), 2) AS usage_usd,
+           ROUND(SUM(IFNULL((SELECT SUM(c.amount) FROM UNNEST(credits) c), 0)), 2) AS credits_usd
+    FROM `savi-security.billing_export.gcp_billing_export_v1_01B643_761629_CA8FDF`
+    WHERE invoice.month = "202611"
+    GROUP BY service ORDER BY usage_usd DESC'
+  ```
+
+  `cost` is usage before credits, the same figure as the console's "Usage cost". The export was switched on in November 2026, so the table may not hold an earlier period. If the query returns nothing for the period, ask the user for the console total (Billing → Reports, savings unticked), or read it there with Claude in Chrome.
 - **OpenRouter.** With a management key, `GET https://openrouter.ai/api/v1/keys` lists every key with its usage. Without one, read the local key alone and say the figure covers that key only:
 
   ```bash
