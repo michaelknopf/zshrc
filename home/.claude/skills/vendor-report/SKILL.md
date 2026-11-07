@@ -53,19 +53,19 @@ Ramp shows only the spend the signed-in user's role can see. If `ramp_token_info
 
 Ramp undercounts these vendors: AWS and GCP run on credits, OpenRouter routes through our own AWS and GCP keys (BYOK), and Tavily was bought in bulk. Report what each would cost, or how fast the prepaid balance is burning.
 
+Report one total per vendor. Breakdowns by service, project or model belong in a cost investigation, not this report.
+
 The OpenRouter and Tavily figures are running totals, not per-period amounts. Store each reading in the inventory JSON (Phase 6) and take the period's usage as the difference from the previous report's reading. A first report records the baseline and says the period figure starts next time.
 
-- **AWS.** Load the `savi:aws-cost-analysis` skill and run its fetch, with `--months 3` on a quarterly run. Follow its rules for reading the bundle: its figures are usage before credits, and `record_type_totals` gives the credits applied. Report usage and credits for the period and the top services by usage.
-- **GCP.** The billing account exports standard usage cost to BigQuery (`savi-security.billing_export`, created in gcp-tf). Query the period's usage and credits per service, with `invoice.month` as `YYYYMM` (`IN` both months on a quarterly run):
+- **AWS.** Load the `savi:aws-cost-analysis` skill and run its fetch, with `--months 3` on a quarterly run. Follow its rules for reading the bundle: its figures are usage before credits, and `record_type_totals` gives the credits applied. Report usage and credits for the period.
+- **GCP.** The billing account exports standard usage cost to BigQuery (`savi-security.billing_export`, created in gcp-tf). Query the period's usage and credits, with `invoice.month` as `YYYYMM` (`IN` both months on a quarterly run):
 
   ```bash
   bq query --project_id=savi-security --use_legacy_sql=false --format=prettyjson '
-    SELECT service.description AS service,
-           ROUND(SUM(cost), 2) AS usage_usd,
+    SELECT ROUND(SUM(cost), 2) AS usage_usd,
            ROUND(SUM(IFNULL((SELECT SUM(c.amount) FROM UNNEST(credits) c), 0)), 2) AS credits_usd
     FROM `savi-security.billing_export.gcp_billing_export_v1_01B643_761629_CA8FDF`
-    WHERE invoice.month = "202611"
-    GROUP BY service ORDER BY usage_usd DESC'
+    WHERE invoice.month = "202611"'
   ```
 
   `cost` is usage before credits, the same figure as the console's "Usage cost". The export was switched on in November 2026, so the table may not hold an earlier period. If the query returns nothing for the period, ask the user for the console total (Billing → Reports, savings unticked), or read it there with Claude in Chrome.
@@ -75,7 +75,7 @@ The OpenRouter and Tavily figures are running totals, not per-period amounts. St
   keyfile run openrouter -- sh -c 'curl -s https://openrouter.ai/api/v1/key -H "Authorization: Bearer $SAVI_LLM__OPENROUTER_API_KEY"'
   ```
 
-  Record `usage` (billed by OpenRouter) and `byok_usage` (billed to our AWS and GCP keys, so already inside their usage; report it as LLM cost routed through OpenRouter, not as extra spend).
+  Record `usage`: what OpenRouter bills us, and the only OpenRouter figure the report shows. Leave out `byok_usage`. It is billed to our AWS and GCP keys, so AWS and GCP usage already count it.
 - **Tavily.**
 
   ```bash
@@ -126,7 +126,7 @@ Read Museum's `get_authoring_guide` before writing. Use the house kit with one v
 - **Summary:** total Ramp spend for the period and trailing 12 months, usage behind credits, the changes from Phase 5, and the data's coverage limits.
 - **Paid vendors:** the `paid-in-code` table: vendor, purpose, repos, period spend, trailing-12-month spend, active months, billing.
 - **Code-only:** vendors the code depends on with no Ramp charge, and why (credits, free tier, billed elsewhere) where known.
-- **Usage:** the Phase 3 figures. AWS and GCP usage before credits next to the credits applied; OpenRouter's billed and BYOK cost; Tavily credits used this period, plan remaining, and projected run-out date. Across several reports, a trend chart per vendor.
+- **Usage:** the Phase 3 figures. AWS and GCP usage before credits next to the credits applied; OpenRouter's billed usage, excluding BYOK; Tavily credits used this period, plan remaining, and projected run-out date. Across several reports, a trend chart per vendor.
 - **Other spend:** `non-engineering` and `unclassified`.
 - **History:** links to the previous reports, each with `target="_blank"`.
 
@@ -145,7 +145,7 @@ Embed the inventory for the next run:
    "aws": {"usage_usd": 4210.55, "credits_usd": -4210.55, "months": ["2026-11"]},
    "gcp": {"usage_usd": null, "source": "not measured"},
    "openrouter": {"as_of": "2026-12-01", "keys": "local key only",
-                  "usage_total_usd": 0, "byok_usage_total_usd": 76.60},
+                  "usage_total_usd": 0},
    "tavily": {"as_of": "2026-12-01", "plan": "Scale",
               "plan_usage_total": 2279445, "plan_limit": 3600000}}}
 </script>
