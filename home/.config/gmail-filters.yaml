@@ -662,11 +662,6 @@ accounts:
         labels:
           - updates
       - criteria:
-          from: danielasgari@google.com
-        labels:
-          - marketing
-        archive: true
-      - criteria:
           from: michael.p.knopf@gmail.com
           subject: 'Accepted:'
         labels:
