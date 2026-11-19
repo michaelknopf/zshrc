@@ -55,7 +55,8 @@
     "firebase@firebase": false,
     "figma@claude-plugins-official": true,
     "savi@savi-live": true,
-    "mk@savi-live": true
+    "mk@savi-live": true,
+    "impeccable@impeccable": true
   },
   "extraKnownMarketplaces": {
     "marimo-pair": {
@@ -81,9 +82,14 @@
         "source": "directory",
         "path": "/Users/mknopf/.claude/local-marketplaces/savi-live"
       }
+    },
+    "impeccable": {
+      "source": {
+        "source": "github",
+        "repo": "pbakaus/impeccable"
+      }
     }
   },
-  "outputStyle": "Concise",
   "alwaysThinkingEnabled": false,
   "effortLevel": "high",
   "awaySummaryEnabled": true,
