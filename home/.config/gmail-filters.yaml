@@ -1007,8 +1007,8 @@ accounts:
       min_age_hours: 12
       buckets:
         - name: customer-support
-          action: keep
-          definition: Real users writing to a support@ or hello@ group about the product
+          action: read-once
+          definition: Real users writing to a support@ or hello@ group about the product. The user reads these out of interest and does not answer them
         - name: colleagues
           action: keep
           definition: People at savisecurity.com
