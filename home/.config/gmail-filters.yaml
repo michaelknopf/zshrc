@@ -1002,3 +1002,59 @@ accounts:
         - from:admin@savisecurity.com subject:"[GitHub]"
         - from:hello@savisecurity.com subject:"wrong number"
         - label:"OpenRouter/Security"
+    # Inbox triage state, read and written by /mk:inbox-triage. Must stay after `sweep:`.
+    triage:
+      min_age_hours: 12
+      buckets:
+        - name: customer-support
+          action: keep
+          definition: Real users writing to a support@ or hello@ group about the product
+        - name: colleagues
+          action: keep
+          definition: People at savisecurity.com
+        - name: known-contacts
+          action: keep
+          definition: External people the user has written to before
+        - name: action-needed
+          action: keep
+          definition: Account or vendor notices that ask the user to act, with a deadline still ahead
+        - name: cold-outreach
+          action: archive
+          definition: Unsolicited pitches from people the user has never written to (funding, recruiting, agencies, intros, follow-ups)
+        - name: group-solicitation
+          action: archive
+          definition: Pitches sent to a support@/hello@ group instead of a person (investors, valuations, working capital, event inquiries)
+        - name: vendor-drip
+          action: archive
+          definition: Onboarding, newsletters, feature announcements and marketing from vendors
+        - name: stale-notice
+          action: archive
+          definition: One-time codes, passkey and login confirmations, reminders for dates already past, routine reports
+        - name: own-newsletter
+          action: archive
+          definition: The company's own newsletter sends (Scamwise, from hello@)
+      senders:
+        - { match: decodo.com, bucket: vendor-drip }
+        - { match: notifications@oxylabs.io, bucket: vendor-drip }
+        - { match: laura.lip@oxylabs.io, bucket: cold-outreach }
+        - { match: realitydefender.ai, bucket: vendor-drip }
+        - { match: realitydefender.com, bucket: vendor-drip }
+        - { match: strella.io, bucket: vendor-drip }
+        - { match: discover.telnyx.com, bucket: vendor-drip }
+        - { match: mail.artificialanalysis.ai, bucket: vendor-drip }
+        - { match: freeswitch.com, bucket: vendor-drip }
+        - { match: weeklyreadout@mail.beehiiv.com, bucket: vendor-drip }
+        - { match: po.atlassian.net, bucket: vendor-drip }
+        - { match: notifications@openrouter.ai, bucket: stale-notice }
+        - { match: teamanthromachina.co, bucket: cold-outreach }
+        - { match: flarerunway.com, bucket: cold-outreach }
+        - { match: usesoax.com, bucket: cold-outreach }
+        - { match: activewithai.org, bucket: cold-outreach }
+        - { match: growthbizcapfunding.info, bucket: cold-outreach }
+        - { match: goaudiencepath.pro, bucket: cold-outreach }
+        - { match: calderterrace.co, bucket: cold-outreach }
+        - { match: elitebusinessplancompany.com, bucket: cold-outreach }
+        - { match: austinedgecomms.com, bucket: cold-outreach }
+        - { match: anamlivepro.com, bucket: cold-outreach }
+        - { match: trobins@linkedin.com, bucket: cold-outreach }
+      pending_filters: []
