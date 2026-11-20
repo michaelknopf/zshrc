@@ -26,6 +26,11 @@ accounts:
         labels:
           - Apple/App Review
       - criteria:
+          from: no_reply@email.apple.com
+          subject: has one or more issues
+        labels:
+          - Apple/App Review
+      - criteria:
           from: testflight_no_reply@email.apple.com
         labels:
           - Apple/TestFlight
@@ -1087,4 +1092,5 @@ accounts:
         - { match: trobins@linkedin.com, bucket: cold-outreach }
         - { match: marlinkupapp.biz, bucket: cold-outreach }
         - { match: lemmyinc.com, bucket: cold-outreach }
+        - { match: danielasgari@google.com, bucket: vendor-drip }
       pending_filters: []
