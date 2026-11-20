@@ -1092,5 +1092,4 @@ accounts:
         - { match: trobins@linkedin.com, bucket: cold-outreach }
         - { match: marlinkupapp.biz, bucket: cold-outreach }
         - { match: lemmyinc.com, bucket: cold-outreach }
-        - { match: danielasgari@google.com, bucket: vendor-drip }
       pending_filters: []
