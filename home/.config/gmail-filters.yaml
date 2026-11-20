@@ -957,12 +957,16 @@ accounts:
       - criteria:
           from: no-reply-aws@amazon.com
           subject: Quota Increase
-          query: '"quota increase request has been approved"'
         labels:
           - AWS/AWS Support
         archive: true
       - criteria:
           from: health@aws.com
+          subject: Service Quotas Utilization
+        labels:
+          - AWS
+      - criteria:
+          query: list:(<aws.savisecurity.com>)
           subject: Service Quotas Utilization
         labels:
           - AWS
