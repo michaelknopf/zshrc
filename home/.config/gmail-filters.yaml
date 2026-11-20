@@ -942,6 +942,30 @@ accounts:
           from: security@updates.linear.app
         labels:
           - Linear/Security
+      - criteria:
+          from: no-reply-aws@amazon.com
+          subject: You have opened a new Support case
+        labels:
+          - AWS/AWS Support
+        archive: true
+      - criteria:
+          from: no-reply-aws@amazon.com
+          subject: Customer Added Communication
+        labels:
+          - AWS/AWS Support
+        archive: true
+      - criteria:
+          from: no-reply-aws@amazon.com
+          subject: Quota Increase
+          query: '"quota increase request has been approved"'
+        labels:
+          - AWS/AWS Support
+        archive: true
+      - criteria:
+          from: health@aws.com
+          subject: Service Quotas Utilization
+        labels:
+          - AWS
     sweep:
       label: Delayed Archive
       days: 7
@@ -1057,4 +1081,6 @@ accounts:
         - { match: austinedgecomms.com, bucket: cold-outreach }
         - { match: anamlivepro.com, bucket: cold-outreach }
         - { match: trobins@linkedin.com, bucket: cold-outreach }
+        - { match: marlinkupapp.biz, bucket: cold-outreach }
+        - { match: lemmyinc.com, bucket: cold-outreach }
       pending_filters: []
