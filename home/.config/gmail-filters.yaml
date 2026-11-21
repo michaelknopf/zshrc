@@ -970,11 +970,55 @@ accounts:
           subject: Service Quotas Utilization
         labels:
           - AWS
+        archive: true
       - criteria:
           query: list:(<aws.savisecurity.com>)
           subject: Service Quotas Utilization
         labels:
           - AWS
+        archive: true
+      - criteria:
+          from: health@aws.com
+          subject: Upcoming routine retirement of your AWS Elastic Container Service tasks running on AWS Fargate
+        labels:
+          - AWS
+        archive: true
+      - criteria:
+          from: fraud-prevention@aws.com
+          subject: Your Request For Accessing AWS Resources Has Been Validated
+        labels:
+          - AWS
+        archive: true
+      - criteria:
+          query: list:(<aws.savisecurity.com>)
+          subject: Your Request For Accessing AWS Resources Has Been Validated
+        labels:
+          - AWS
+        archive: true
+      - criteria:
+          from: health@aws.com
+          subject: Upgrade from SageMaker Python SDK V2
+        labels:
+          - AWS
+        archive: true
+      - criteria:
+          query: list:(<aws.savisecurity.com>)
+          subject: Upgrade from SageMaker Python SDK V2
+        labels:
+          - AWS
+        archive: true
+      - criteria:
+          from: health@aws.com
+          subject: Update AWS Systems Manager Session Manager IAM policies and plugin
+        labels:
+          - AWS
+        archive: true
+      - criteria:
+          query: list:(<aws.savisecurity.com>)
+          subject: Update AWS Systems Manager Session Manager IAM policies and plugin
+        labels:
+          - AWS
+        archive: true
     sweep:
       label: Delayed Archive
       days: 7
@@ -1092,4 +1136,5 @@ accounts:
         - { match: trobins@linkedin.com, bucket: cold-outreach }
         - { match: marlinkupapp.biz, bucket: cold-outreach }
         - { match: lemmyinc.com, bucket: cold-outreach }
+        - { match: bigsamsamuelu@gmail.com, bucket: group-solicitation }
       pending_filters: []
