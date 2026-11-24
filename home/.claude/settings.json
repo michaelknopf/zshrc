@@ -91,7 +91,6 @@
     }
   },
   "alwaysThinkingEnabled": false,
-  "effortLevel": "high",
   "awaySummaryEnabled": true,
   "showClearContextOnPlanAccept": true,
   "tui": "default",
